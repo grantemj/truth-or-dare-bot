@@ -30,17 +30,3 @@ try {
 } catch (e) {
     console.log(e)
 }
-
-setInterval(() => {
-    if (os.freemem() / os.totalmem() < 0.05) {
-        console.log(`Out of memory, mem: ${1 - (os.freemem() / os.totalmem())}. Restarting...`);
-        try {
-            manager.respawnAll();
-        } catch(e) {
-            console.log(e)
-        } finally {
-            logins++;
-            console.log(logins);
-        }
-    }
-}, 600000);

@@ -20,7 +20,10 @@ async function disableCommand(args, message, guildSettings, serverPrefix) {
             let commands = args.filter(item => ["truth", "dare", "wyr", "nhie", "paranoia"].includes(item));
             let categories = args.filter(item => ["pg", "pg13", "r", "d", "irl"].includes(item));
             let toBeDisabled = [];
-            if (commands.length !== 0) {
+            if (args.includes("all")) {
+                toBeDisabled = ["truth pg", "truth pg13", "dare pg", "dare pg13", "dare d", "dare irl", "wyr pg", "wyr pg13", "nhie pg", "nhie pg13", "paranoia pg", "paranoia pg13"]
+            }
+            else if (commands.length !== 0) {
                 for (let command of commands) {
                     if (categories.length !== 0) {
                         for (let category of categories) {
@@ -44,15 +47,13 @@ async function disableCommand(args, message, guildSettings, serverPrefix) {
                     }
                 }
             }
-            else {
-                if (categories.length !== 0) {
-                    for (let category of categories) {
-                        if (category === "d" || category === "irl") {
-                            toBeDisabled.push("dare " + category);
-                        }
-                        else {
-                            ["truth", "dare", "wyr", "nhie", "paranoia"].forEach(command => toBeDisabled.push(command + " " + category));
-                        }
+            else if (categories.length !== 0) {
+                for (let category of categories) {
+                    if (category === "d" || category === "irl") {
+                        toBeDisabled.push("dare " + category);
+                    }
+                    else {
+                        ["truth", "dare", "wyr", "nhie", "paranoia"].forEach(command => toBeDisabled.push(command + " " + category));
                     }
                 }
             }
