@@ -139,6 +139,7 @@ client.on('rateLimit', (info) => {
     console.log(`Rate limit hit, Time: ${info.timeout ? info.timeout : 'Unknown timeout '}, Path: ${info.path || 'Unknown path'}, Route: ${info.route || 'Unknown route'}`);
 });
 client.on('guildCreate', async (guild) => {
+    if (client.guilds.cache.has(guild.id)) return;
     console.log(`Server joined: ${guild.name} (${guild.id})`);
 
     let newGuildSettings = {};
@@ -197,6 +198,7 @@ client.on('interaction', interaction => {
     if (!interaction.isCommand()) return;
     // WIP for future slash commands
     if (client.slashCommands.has(interaction.commandName) {
+        interaction.defer();
         client.slashCommands.get(interaction.commandName)(args, interaction, guildSettings);
     }
 });
