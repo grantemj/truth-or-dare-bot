@@ -122,7 +122,7 @@ export {
 fs.readdirSync('./Commands/').forEach(file => {
     const cmd = (await import(`./Commands/${file}`));
     client.commands.set(file.split('Command')[0], cmd.Command);
-    if (cmd.slashCommand) client.slashCommands.set(file.split('Command')[0], cmd.slashCommand);
+    if (cmd.SlashCommand) client.slashCommands.set(file.split('Command')[0], cmd.SlashCommand);
 });
 
 initiateMongo().then(async () => {
@@ -145,10 +145,10 @@ client.on('guildCreate', async (guild) => {
     let newGuildSettings = {};
 
     guild.channels.cache
-    .filter(c => c.type === 'text')
-    .forEach(c => {
-        if (c.nsfw) { newGuildSettings[c.id] = rRatedSettings }
-        else { newGuildSettings[c.id] = defaultSettings }
+        .filter(c => c.type === 'text')
+        .forEach(c => {
+            if (c.nsfw) { newGuildSettings[c.id] = rRatedSettings }
+            else { newGuildSettings[c.id] = defaultSettings }
     });
 
     await updateServerCount(client.shard.ids[0], client.guilds.cache.size)
@@ -207,16 +207,18 @@ client.on('message', async (message) => {
     if (message.author.id === client.user.id || message.author.bot) {
         return;
     }
-    if (message.guild) {
-        const { guild, channel } = message;
+    const { guild, channel } = message;
+    if (guild) {
         let prefix = await getPrefix(guild.id);
         if (message.content.startsWith(prefix || '+')) {
             let guildSettings = await getServerSettings(guild.id);
             if (guildSettings === undefined || guildSettings === null) {
                 console.log("Unindexed guild");
                 let newGuildSettings = {};
-                guild.channels.cache.filter(c => c.type === 'text').forEach(c => {
-                    newGuildSettings[c.id] = defaultSettings;
+                guild.channels.cache
+                    .filter(c => c.type === 'text')
+                    .forEach(c => {
+                        newGuildSettings[c.id] = defaultSettings;
                 });
                 await setServerSettings(guild.id, newGuildSettings);
                 guildSettings = newGuildSettings
@@ -243,6 +245,7 @@ client.on('message', async (message) => {
         }
     }
 });
+
 async function processCommand(message, guildSettings, dm) {
     if (!dm) {
         var guildPrefix = await getPrefix(message.guild.id);
@@ -269,6 +272,44 @@ async function processCommand(message, guildSettings, dm) {
                 sendMessage(message.channel, "You're sending commands too fast, wait a few seconds before trying another");
             }
             else if (!guildSettings[message.channel.id]["muted?"]) {
+                if (primaryCommand === 'random') {
+                    let categories = [];
+                    if (guildSettings["truth pg"] || guildSettings["truth pg13"] || guildSettings["truth r"]) {
+                        categories.push("truth");
+                    }
+                    if ((guildSettings["dare pg"] || guildSettings["dare pg13"] || guildSettings["dare r"]) && (guildSettings["dare d"] || guildSettings["dare irl"])) {
+                        categories.push("dare");
+                    }
+                    if (guildSettings["wyr pg"] || guildSettings["wyr pg13"] || guildSettings["wyr r"]) {
+                        categories.push("wyr");
+                    }
+                    if (guildSettings["nhie pg"] || guildSettings["nhie pg13"] || guildSettings["nhie r"]) {
+                        categories.push("nhie");
+                    }
+                    while (true) {
+                        let rand = Math.random();
+                        if (rand < 0.25 && categories.includes("truth")) {
+                            client.commands.get('truth')(args, message, guildSettings);
+                            break;
+                        }
+                        else if (rand < 0.5 && categories.includes("dare")) {
+                            client.commands.get('dare')(args, message, guildSettings);
+                            break;
+                        }
+                        else if (rand < 0.75 && categories.includes("wyr")) {
+                            client.commands.get('wyr')(args, message, guildSettings);
+                            break;
+                        }
+                        else if (categories.includes("nhie")) {
+                            client.commands.get('nhie')(args, message, guildSettings);
+                            break;
+                        }
+                    }
+                } else {
+                    if (client.commands.has(primaryCommand)) {
+                        client.commands.get(primaryCommand)(args, message, guildSettings);
+                    }
+                }
                 switch (primaryCommand) {
                     case "tod": {
                         let truthEnabled = guildSettings[message.channel.id]["truth pg"] || guildSettings[message.channel.id]["truth pg13"] || guildSettings[message.channel.id]["truth r"];
@@ -314,38 +355,6 @@ async function processCommand(message, guildSettings, dm) {
                         paranoiaCommand(args, message, guildSettings);
                         break;
                     case "random": {
-                        let categories = [];
-                        if (guildSettings["truth pg"] || guildSettings["truth pg13"] || guildSettings["truth r"]) {
-                            categories.push("truth");
-                        }
-                        if ((guildSettings["dare pg"] || guildSettings["dare pg13"] || guildSettings["dare r"]) && (guildSettings["dare d"] || guildSettings["dare irl"])) {
-                            categories.push("dare");
-                        }
-                        if (guildSettings["wyr pg"] || guildSettings["wyr pg13"] || guildSettings["wyr r"]) {
-                            categories.push("wyr");
-                        }
-                        if (guildSettings["nhie pg"] || guildSettings["nhie pg13"] || guildSettings["nhie r"]) {
-                            categories.push("nhie");
-                        }
-                        while (true) {
-                            let rand = Math.random();
-                            if (rand < 0.25 && categories.includes("truth")) {
-                                truthCommand(args, message, guildSettings);
-                                break;
-                            }
-                            else if (rand < 0.5 && categories.includes("dare")) {
-                                dareCommand(args, message, guildSettings);
-                                break;
-                            }
-                            else if (rand < 0.75 && categories.includes("wyr")) {
-                                wyrCommand(args, message, guildSettings);
-                                break;
-                            }
-                            else if (categories.includes("nhie")) {
-                                nhieCommand(args, message, guildSettings);
-                                break;
-                            }
-                        }
                         break;
                     }
                     case "ans":
