@@ -1,6 +1,6 @@
-export { statsCommand };
+export { Command };
 import { client, Discord, sendMessage, getServerCount, getStatistics } from '../bot.js';
-async function statsCommand(message) {
+async function Command(message) {
     let serverCount = await getServerCount();
     // let upvoteCount = (await topggAPI.getBot("692045914436796436")).monthlyPoints;
     let upvoteCount = "∞"
