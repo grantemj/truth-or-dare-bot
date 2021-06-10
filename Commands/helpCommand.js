@@ -21,6 +21,7 @@ function helpCommand(args, message, guildPrefix) {
                     { name: `__${guildPrefix}wyr [rating]__`, value: 'Asks a \'would you rather\' question, can specify type of question with arguments.' },
                     { name: `__${guildPrefix}nhie [rating]__`, value: 'Gives a \'never have I ever\' prompt, can specify type with arguments.' },
                     { name: `__${guildPrefix}paranoia [target] [rating]__`, value: 'Sends a paranoia question to the target, can specify type of question with arguments. Answer a question with \'' + guildPrefix + 'ans.\' You must mention the target (@ them), not type their nickname out.' },
+                    { name: `__${guildPrefix}clearparanoia__`, value: 'Used to clear unanswered paranoia questions, can only be done in DMs.' },
                     { name: `__${guildPrefix}ans [answer]__`, value: 'Used to answer a paranoia question, can only be done in DMs.' },
                     { name: `__${guildPrefix}truthful [target]__`, value: 'Uses semi-quasi-pseudo-random procedures to tell you how truthful a user is while answering questions.' }
                 ], message, guildPrefix);
