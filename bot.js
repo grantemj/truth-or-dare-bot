@@ -329,6 +329,7 @@ async function processCommand(message, guildSettings, dm) {
                     case "ans":
                         sendMessage(message.channel, "You can only use that command in DMs");
                         break;
+                    case "cp":
                     case "clearparanoia":
                         sendMessage(message.channel, "You can only use that command in DMs");
                         break;
@@ -341,18 +342,24 @@ async function processCommand(message, guildSettings, dm) {
                     case "prefix":
                         prefixCommand(args.map(item => { return item.toLowerCase(); }), message, guildPrefix);
                         break;
+                    case "en":
                     case "enable":
                         enableCommand(args.map(item => { return item.toLowerCase(); }), message, guildSettings, guildPrefix);
                         break;
+                    case "dis":
                     case "disable":
                         disableCommand(args.map(item => { return item.toLowerCase(); }), message, guildSettings, guildPrefix);
                         break;
+                    case "config":
                     case "settings":
                         settingsCommand(args.map(item => { return item.toLowerCase(); }), message, guildSettings);
                         break;
+                    case "sp":
+                    case "toggleparanoia":
                     case "showparanoia":
                         showParanoiaCommand(args, message, guildSettings, guildPrefix);
                         break;
+                    case "tf":
                     case "truthful":
                         truthfulCommand(message, args);
                         break;
@@ -371,7 +378,9 @@ async function processCommand(message, guildSettings, dm) {
                     case "shards":
                         sendMessage(message.channel, JSON.stringify(await client.shard.fetchClientValues("readyTimestamp")));
                         break;
+                    case "m":
                     case "mute":
+                    case "um":
                     case "unmute":
                     case "":
                         break;
