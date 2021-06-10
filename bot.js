@@ -74,11 +74,6 @@ setInterval(() => {
     }
 }, 600000);
 
-fs.readdirSync('./Commands/').forEach(file => {
-    const { Command } = (await import(`./Commands/${file}`));
-    client.commands.set(file.split('Command')[0], Command);
-});
-
 import { helpCommand } from './Commands/helpCommand.js';
 import { truthCommand } from './Commands/truthCommand.js';
 import { dareCommand } from './Commands/dareCommand.js';
@@ -123,6 +118,12 @@ export {
     getServerCount,
     getStatistics
 };
+
+fs.readdirSync('./Commands/').forEach(file => {
+    const cmd = (await import(`./Commands/${file}`));
+    client.commands.set(file.split('Command')[0], cmd.Command);
+    if (cmd.slashCommand) client.slashCommands.set(file.split('Command')[0], cmd.slashCommand);
+});
 
 initiateMongo().then(async () => {
     console.log("MongoDB connected")
@@ -195,6 +196,9 @@ client.on('channelDelete', async (channel) => {
 client.on('interaction', interaction => {
     if (!interaction.isCommand()) return;
     // WIP for future slash commands
+    if (client.slashCommands.has(interaction.commandName) {
+        client.slashCommands.get(interaction.commandName)(args, interaction, guildSettings);
+    }
 });
 
 client.on('message', async (message) => {
