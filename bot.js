@@ -10,7 +10,7 @@ const client = new Discord.Client({
     cacheEmojis: false,
     cachePresences: false,
     disableMentions: 'everyone',
-    ws: { intents: ["GUILDS", "GUILD_MESSAGES", "DIRECT_MESSAGES"] }
+    intents: ["GUILDS", "GUILD_MESSAGES", "DIRECT_MESSAGES"]
 });
 /* const topgg = require('@top-gg/sdk');
 const topggAPI = new topgg.Api(process.env.TOPGG); */
