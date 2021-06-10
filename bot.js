@@ -89,12 +89,37 @@ import { truthfulCommand } from './Commands/truthfulCommand.js';
 import { pingCommand } from './Commands/pingCommand.js';
 import { statsCommand } from './Commands/statsCommand.js';
 import { clearParanoiaCommand } from './Commands/clearParanoiaCommand.js';
-import { initiateMongo, getServerSettings, setServerSettings, deleteServerSettings, getPrefix, setPrefix, deletePrefix, getServerCount, updateServerCount, getStatistics, setStatistics } from './mongodbFunctions.js';
-export { Discord, client, fs, TRUTHQUESTIONS, DAREQUESTIONS, WYRQUESTIONS, NHIEQUESTIONS, PARANOIAQUESTIONS, sendMessage, getServerCount, getStatistics };
+import {
+    initiateMongo,
+    getServerSettings,
+    setServerSettings,
+    deleteServerSettings,
+    getPrefix, setPrefix,
+    deletePrefix,
+    getServerCount,
+    updateServerCount,
+    getStatistics,
+    setStatistics
+} from './mongodbFunctions.js';
+export {
+    Discord,
+    client,
+    fs,
+    TRUTHQUESTIONS,
+    DAREQUESTIONS,
+    WYRQUESTIONS,
+    NHIEQUESTIONS,
+    PARANOIAQUESTIONS,
+    sendMessage,
+    getServerCount,
+    getStatistics
+};
+
 initiateMongo().then(async () => {
     console.log("MongoDB connected")
     await client.login(process.env.TOKEN).catch(console.error);
 });
+
 client.on('debug', console.log)
 client.on('ready', () => {
     console.log("Connected");
@@ -108,15 +133,11 @@ client.on('guildCreate', async (guild) => {
 
     let newGuildSettings = {};
 
-    guild.channels.cache.forEach(channel => {
-        if (channel.type === "text") {
-            if (channel.nsfw) {
-                newGuildSettings[channel.id] = rRatedSettings;
-            }
-            else {
-                newGuildSettings[channel.id] = defaultSettings;
-            }
-        }
+    guild.channels.cache
+    .filter(c => c.type === 'text')
+    .forEach(c => {
+        if (c.nsfw) { newGuildSettings[c.id] = rRatedSettings }
+        else { newGuildSettings[c.id] = defaultSettings }
     });
 
     await updateServerCount(client.shard.ids[0], client.guilds.cache.size)
@@ -150,25 +171,7 @@ client.on('guildDelete', async (guild) => {
     await deleteServerSettings(guild.id);
     await deletePrefix(guild.id);
 });
-client.on('channelCreate', async (newChannel) => {
-    if (newChannel?.type === "text") {
-        let newGuild = newChannel.guild;
-        let guildSettings = await getServerSettings(newGuild.id);
-        if (guildSettings === undefined || guildSettings === null) {
-            let newGuildSettings = {};
-            newGuild.channels.cache.forEach(channel => {
-                if (channel.type === "text") {
-                    newGuildSettings[channel.id] = defaultSettings;
-                }
-            });
-            await setServerSettings(newGuild.id, newGuildSettings);
-        }
-        else {
-            guildSettings[newChannel.id] = defaultSettings;
-            await setServerSettings(newGuild.id, guildSettings);
-        }
-    }
-});
+
 client.on('channelDelete', async (channel) => {
     if (channel?.type === "text") {
         let guild = channel.guild;
@@ -179,29 +182,33 @@ client.on('channelDelete', async (channel) => {
         await setServerSettings(guild.id, guildSettings);
     }
 });
+
+client.on('interaction', interaction => {
+    if (!interaction.isCommand()) return;
+    // WIP for future slash commands
+});
+
 client.on('message', async (message) => {
-    if (message.author.id === client.user.id) {
+    if (message.author.id === client.user.id || message.author.bot) {
         return;
     }
-    if (message.channel.type === "text") {
-        let guild = message.guild;
+    if (message.guild) {
+        const { guild, channel } = message;
         let prefix = await getPrefix(guild.id);
         if (message.content.startsWith(prefix || '+')) {
             let guildSettings = await getServerSettings(guild.id);
             if (guildSettings === undefined || guildSettings === null) {
                 console.log("Unindexed guild");
                 let newGuildSettings = {};
-                guild.channels.cache.forEach(channel => {
-                    if (channel.type === "text") {
-                        newGuildSettings[channel.id] = defaultSettings;
-                    }
+                guild.channels.cache.filter(c => c.type === 'text').forEach(c => {
+                    newGuildSettings[c.id] = defaultSettings;
                 });
                 await setServerSettings(guild.id, newGuildSettings);
                 guildSettings = newGuildSettings
             }
-            if (!guildSettings.hasOwnProperty(message.channel.id)) {
+            if (!guildSettings.hasOwnProperty(channel.id)) {
                 console.log("Unindexed channel");
-                guildSettings[message.channel.id] = defaultSettings;
+                guildSettings[channel.id] = defaultSettings;
                 await setServerSettings(guild.id, guildSettings);
             }
             processCommand(message, guildSettings, false);
@@ -211,7 +218,7 @@ client.on('message', async (message) => {
                     .setTitle("Links")
                     .addField('\u200B', 'Enjoying the bot? Make sure to [give feedback](https://truthordarebot.xyz/feedback) and [suggest questions](https://truthordarebot.xyz/question_submit).')
                     .setTimestamp();
-                sendMessage(message.channel, linkEmbed);
+                sendMessage(channel, linkEmbed);
             }
         }
     }
@@ -234,9 +241,9 @@ async function processCommand(message, guildSettings, dm) {
         var guildPrefix = "+";
         var fullCommand = message.content.substr(1);
     }
-    let splitCommand = fullCommand.split(" ");
-    let primaryCommand = splitCommand[0].toLowerCase();
-    let args = splitCommand.slice(1).filter(item => { return (item !== ""); });
+    let splitCommand = fullCommand.toLowerCase().trim().split(" ");
+    let primaryCommand = splitCommand[0];
+    let args = splitCommand.slice(1);
     if (args.some(item => { return /\[.+\]/.test(item); }) && primaryCommand !== "ans") {
         sendMessage(message.channel, `You don't need to enclose your arguments in brackets, the help command uses them as placeholders. Example: Use ${guildPrefix}truth pg, not ${guildPrefix}truth [pg]`);
     }
@@ -252,13 +259,13 @@ async function processCommand(message, guildSettings, dm) {
                         let truthEnabled = guildSettings[message.channel.id]["truth pg"] || guildSettings[message.channel.id]["truth pg13"] || guildSettings[message.channel.id]["truth r"];
                         let dareEnabled = (guildSettings[message.channel.id]["dare pg"] || guildSettings[message.channel.id]["dare pg13"] || guildSettings[message.channel.id]["dare r"]) && (guildSettings[message.channel.id]["dare irl"] || guildSettings[message.channel.id]["dare d"]);
                         if (truthEnabled && dareEnabled) {
-                            (Math.random() < 0.5) ? truthCommand(args.map(item => { return item.toLowerCase(); }), message, guildSettings) : dareCommand(args.map(item => { return item.toLowerCase(); }), message, guildSettings);
+                            (Math.random() < 0.5) ? truthCommand(args, message, guildSettings) : dareCommand(args, message, guildSettings);
                         }
                         else if (truthEnabled) {
-                            truthCommand(args.map(item => { return item.toLowerCase(); }), message, guildSettings);
+                            truthCommand(args, message, guildSettings);
                         }
                         else if (dareEnabled) {
-                            dareCommand(args.map(item => { return item.toLowerCase(); }), message, guildSettings);
+                            dareCommand(args, message, guildSettings);
                         }
                         else {
                             sendMessage(message.channel, "Truths and dares are disabled here");
@@ -266,30 +273,30 @@ async function processCommand(message, guildSettings, dm) {
                         break;
                     }
                     case "help":
-                        helpCommand(args.map(item => { return item.toLowerCase(); }), message, guildPrefix);
+                        helpCommand(args, message, guildPrefix);
                         break;
                     case "truth":
                     case "t":
                         client.statistics.truth++;
-                        truthCommand(args.map(item => { return item.toLowerCase(); }), message, guildSettings);
+                        truthCommand(args, message, guildSettings);
                         break;
                     case "dare":
                     case "d":
                         client.statistics.dare++;
-                        dareCommand(args.map(item => { return item.toLowerCase(); }), message, guildSettings);
+                        dareCommand(args, message, guildSettings);
                         break;
                     case "wyr":
                         client.statistics.wyr++;
-                        wyrCommand(args.map(item => { return item.toLowerCase(); }), message, guildSettings);
+                        wyrCommand(args, message, guildSettings);
                         break;
                     case "nhie":
                         client.statistics.nhie++;
-                        nhieCommand(args.map(item => { return item.toLowerCase(); }), message, guildSettings);
+                        nhieCommand(args, message, guildSettings);
                         break;
                     case "paranoia":
                     case "p":
                         client.statistics.paranoia++;
-                        paranoiaCommand(args.map(item => { return item.toLowerCase(); }), message, guildSettings);
+                        paranoiaCommand(args, message, guildSettings);
                         break;
                     case "random": {
                         let categories = [];
@@ -308,19 +315,19 @@ async function processCommand(message, guildSettings, dm) {
                         while (true) {
                             let rand = Math.random();
                             if (rand < 0.25 && categories.includes("truth")) {
-                                truthCommand(args.map(item => { return item.toLowerCase(); }), message, guildSettings);
+                                truthCommand(args, message, guildSettings);
                                 break;
                             }
                             else if (rand < 0.5 && categories.includes("dare")) {
-                                dareCommand(args.map(item => { return item.toLowerCase(); }), message, guildSettings);
+                                dareCommand(args, message, guildSettings);
                                 break;
                             }
                             else if (rand < 0.75 && categories.includes("wyr")) {
-                                wyrCommand(args.map(item => { return item.toLowerCase(); }), message, guildSettings);
+                                wyrCommand(args, message, guildSettings);
                                 break;
                             }
                             else if (categories.includes("nhie")) {
-                                nhieCommand(args.map(item => { return item.toLowerCase(); }), message, guildSettings);
+                                nhieCommand(args, message, guildSettings);
                                 break;
                             }
                         }
@@ -340,19 +347,19 @@ async function processCommand(message, guildSettings, dm) {
                         linkCommand(message);
                         break;
                     case "prefix":
-                        prefixCommand(args.map(item => { return item.toLowerCase(); }), message, guildPrefix);
+                        prefixCommand(args, message, guildPrefix);
                         break;
                     case "en":
                     case "enable":
-                        enableCommand(args.map(item => { return item.toLowerCase(); }), message, guildSettings, guildPrefix);
+                        enableCommand(args, message, guildSettings, guildPrefix);
                         break;
                     case "dis":
                     case "disable":
-                        disableCommand(args.map(item => { return item.toLowerCase(); }), message, guildSettings, guildPrefix);
+                        disableCommand(args, message, guildSettings, guildPrefix);
                         break;
                     case "config":
                     case "settings":
-                        settingsCommand(args.map(item => { return item.toLowerCase(); }), message, guildSettings);
+                        settingsCommand(args, message, guildSettings);
                         break;
                     case "sp":
                     case "toggleparanoia":
@@ -391,7 +398,7 @@ async function processCommand(message, guildSettings, dm) {
         else {
             switch (primaryCommand) {
                 case "help":
-                    helpCommand(args.map(item => { return item.toLowerCase(); }), message, '+');
+                    helpCommand(args, message, '+');
                     break;
                 case "ans":
                     ansCommand(args, message);
@@ -411,10 +418,10 @@ async function processCommand(message, guildSettings, dm) {
     if (!dm) {
         guildSettings = guildSettings;
         if (primaryCommand == "mute") {
-            muteCommand(args.map(item => { return item.toLowerCase(); }), message, guildSettings, guildPrefix);
+            muteCommand(args, message, guildSettings, guildPrefix);
         }
         else if (primaryCommand == "unmute") {
-            unmuteCommand(args.map(item => { return item.toLowerCase(); }), message, guildSettings, guildPrefix);
+            unmuteCommand(args, message, guildSettings, guildPrefix);
         }
     }
 }
