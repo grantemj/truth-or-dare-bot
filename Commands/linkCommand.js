@@ -1,6 +1,6 @@
-export { linkCommand };
+export { Command };
 import { Discord, sendMessage } from '../bot.js';
-function linkCommand(message) {
+function Command(message) {
     let linkEmbed = new Discord.MessageEmbed()
         .setColor('#e91e62')
         .setTitle("Links")
