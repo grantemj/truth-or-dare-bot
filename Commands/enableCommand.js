@@ -4,7 +4,7 @@ import { settingsChange } from './settingsChange.js';
 async function enableCommand(args, message, guildSettings, serverPrefix) {
     let guild = message.guild;
     let messageMember = await guild.members.fetch(message.author.id, false);
-    await guild.roles.fetch();
+    await messageMember.roles.fetch();
     if (!messageMember.hasPermission("ADMINISTRATOR")) {
         sendMessage(message.channel, "You must be an administrator to use this command.");
     }
@@ -71,5 +71,5 @@ async function enableCommand(args, message, guildSettings, serverPrefix) {
             }
         }
     }
-    await guild.roles.fetch({ cache: false, force: true });
+    await messageMember.roles.fetch({ cache: false, force: true });
 }
