@@ -1,6 +1,7 @@
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 const Discord = require("discord.js-light");
+const { Intents:{ FLAGS }} = Discord;
 require('dotenv').config();
 const client = new Discord.Client({
     cacheGuilds: true,
@@ -9,8 +10,8 @@ const client = new Discord.Client({
     cacheRoles: false,
     cacheEmojis: false,
     cachePresences: false,
-    disableMentions: 'everyone',
-    intents: ["GUILDS", "GUILD_MESSAGES", "DIRECT_MESSAGES"]
+    allowedMentions: { parse:['users'], repliedUser: true },
+    intents: [FLAGS.GUILDS, FLAGS.DIRECT_MESSAGES]
 });
 /* const topgg = require('@top-gg/sdk');
 const topggAPI = new topgg.Api(process.env.TOPGG); */
@@ -51,6 +52,8 @@ client.numberDares = DAREQUESTIONS.pg_d.length + DAREQUESTIONS.pg13_d.length + D
 client.numberWyr = WYRQUESTIONS.pg.length + WYRQUESTIONS.pg13.length + WYRQUESTIONS.r.length;
 client.numberNhie = NHIEQUESTIONS.pg.length + NHIEQUESTIONS.pg13.length + NHIEQUESTIONS.r.length;
 client.numberParanoias = PARANOIAQUESTIONS.pg.length + PARANOIAQUESTIONS.pg13.length + PARANOIAQUESTIONS.r.length;
+client.commands = new Discord.Collection();
+client.slashCommands = new Discord.Collection();
 const defaultSettings = { "muted?": false, "truth pg": true, "truth pg13": true, "truth r": false, "dare pg": true, "dare pg13": true, "dare r": false, "dare d": true, "dare irl": true, "wyr pg": true, "wyr pg13": true, "wyr r": false, "nhie pg": true, "nhie pg13": true, "nhie r": false, "paranoia pg": true, "paranoia pg13": true, "paranoia r": false, "show paranoia": "default" };
 const rRatedSettings = { "muted?": false, "truth pg": true, "truth pg13": true, "truth r": true, "dare pg": true, "dare pg13": true, "dare r": true, "dare d": true, "dare irl": true, "wyr pg": true, "wyr pg13": true, "wyr r": true, "nhie pg": true, "nhie pg13": true, "nhie r": true, "paranoia pg": true, "paranoia pg13": true, "paranoia r": true, "show paranoia": "default" };
 var channelTime = {};
@@ -70,6 +73,12 @@ setInterval(() => {
         console.log("Statistics reset");
     }
 }, 600000);
+
+fs.readdirSync('./Commands/').forEach(file => {
+    const { Command } = (await import(`./Commands/${file}`));
+    client.commands.set(file.split('Command')[0], Command);
+});
+
 import { helpCommand } from './Commands/helpCommand.js';
 import { truthCommand } from './Commands/truthCommand.js';
 import { dareCommand } from './Commands/dareCommand.js';
