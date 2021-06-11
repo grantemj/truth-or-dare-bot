@@ -1,19 +1,19 @@
-export { disableCommand };
+export { Command, Meta };
 import { sendMessage } from '../bot.js';
 import { settingsChange } from './settingsChange.js';
-async function disableCommand(args, message, guildSettings, serverPrefix) {
+async function Command(args, message, guildSettings, serverPrefix) {
     let guild = message.guild;
     let messageMember = await guild.members.fetch(message.author.id, false);
-    await guild.roles.fetch();
-    if (!messageMember.hasPermission("ADMINISTRATOR")) {
+    await messageMember.roles.fetch();
+    if (!messageMember.permissions.has(8)) {
         sendMessage(message.channel, "You must be an administrator to use this command.");
     }
-    else if (args.length === 0) {
+    else if (!args.length) {
         sendMessage(message.channel, "You must specify a command (truth, dare, etc.) or category (pg, irl, etc.) to disable.");
     }
     else {
         let settingNames = args.filter(item => item !== "server");
-        if (settingNames.length === 0) {
+        if (!settingNames.length) {
             sendMessage(message.channel, "You must specify a command (truth, dare, etc.) or category (pg, irl, etc.) to disable.");
         }
         else {
@@ -71,5 +71,23 @@ async function disableCommand(args, message, guildSettings, serverPrefix) {
             }
         }
     }
-    await guild.roles.fetch({ cache: false, force: true });
+    await messageMember.roles.fetch({ cache: false, force: true });
+}
+const Meta = {
+    name: 'disable',
+    description: 'Disable permissions for a specified command and rating',
+    options:[
+        {
+            name: 'command',
+            type: 'STRING',
+            description: 'the command to disable'.
+            required: true
+        },
+        {
+            name: 'rating',
+            type: 'STRING',
+            description: 'the rating to disable',
+            required: true
+        }
+    ]
 }
