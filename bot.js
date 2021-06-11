@@ -11,7 +11,7 @@ const client = new Discord.Client({
     cacheEmojis: false,
     cachePresences: false,
     allowedMentions: { parse:['users'], repliedUser: true },
-    intents: [FLAGS.GUILDS, FLAGS.DIRECT_MESSAGES]
+    intents: [FLAGS.GUILDS, FLAGS.GUILD_MESSAGES, FLAGS.DIRECT_MESSAGES]
 });
 /* const topgg = require('@top-gg/sdk');
 const topggAPI = new topgg.Api(process.env.TOPGG); */
@@ -74,25 +74,6 @@ setInterval(() => {
     }
 }, 600000);
 
-import { helpCommand } from './Commands/helpCommand.js';
-import { truthCommand } from './Commands/truthCommand.js';
-import { dareCommand } from './Commands/dareCommand.js';
-import { wyrCommand } from './Commands/wyrCommand.js';
-import { nhieCommand } from './Commands/nhieCommand.js';
-import { paranoiaCommand } from './Commands/paranoiaCommand.js';
-import { ansCommand } from './Commands/ansCommand.js';
-import { linkCommand } from './Commands/linkCommand.js';
-import { prefixCommand } from './Commands/prefixCommand.js';
-import { enableCommand } from './Commands/enableCommand.js';
-import { disableCommand } from './Commands/disableCommand.js';
-import { muteCommand } from './Commands/muteCommand.js';
-import { unmuteCommand } from './Commands/unmuteCommand.js';
-import { settingsCommand } from './Commands/settingsCommand.js';
-import { showParanoiaCommand } from './Commands/showParanoiaCommand.js';
-import { truthfulCommand } from './Commands/truthfulCommand.js';
-import { pingCommand } from './Commands/pingCommand.js';
-import { statsCommand } from './Commands/statsCommand.js';
-import { clearParanoiaCommand } from './Commands/clearParanoiaCommand.js';
 import {
     initiateMongo,
     getServerSettings,
@@ -105,6 +86,7 @@ import {
     getStatistics,
     setStatistics
 } from './mongodbFunctions.js';
+
 export {
     Discord,
     client,
@@ -121,7 +103,7 @@ export {
 
 fs.readdirSync('./Commands/').forEach(file => {
     const cmd = (await import(`./Commands/${file}`));
-    client.commands.set(file.split('Command')[0], cmd.Command);
+    client.commands.set(file.split('Command')[0].toLowerCase(), cmd.Command);
     if (cmd.SlashCommand) client.slashCommands.set(file.split('Command')[0], cmd.SlashCommand);
 });
 
