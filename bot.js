@@ -196,7 +196,6 @@ client.on('channelDelete', async (channel) => {
 
 client.on('interaction', interaction => {
     if (!interaction.isCommand()) return;
-    // WIP for future slash commands
     if (client.slashCommands.has(interaction.commandName) {
         interaction.defer();
         client.slashCommands.get(interaction.commandName)(args, interaction, guildSettings);
@@ -305,150 +304,38 @@ async function processCommand(message, guildSettings, dm) {
                             break;
                         }
                     }
+                } else if (primaryCommand === 'tod') {
+                    let truthEnabled = guildSettings[message.channel.id]["truth pg"] || guildSettings[message.channel.id]["truth pg13"] || guildSettings[message.channel.id]["truth r"];
+                    let dareEnabled = (guildSettings[message.channel.id]["dare pg"] || guildSettings[message.channel.id]["dare pg13"] || guildSettings[message.channel.id]["dare r"]) && (guildSettings[message.channel.id]["dare irl"] || guildSettings[message.channel.id]["dare d"]);
+                    if (truthEnabled && dareEnabled) {
+                        (Math.random() < 0.5)
+                        ? client.commands.get('truth')(args, message, guildSettings)
+                        : client.commands.get('dare')(args, message, guildSettings);
+                    }
+                    else if (truthEnabled) {
+                        client.commands.get('truth')(args, message, guildSettings);
+                    }
+                    else if (dareEnabled) {
+                        client.commands.get('dare')(args, message, guildSettings);
+                    }
+                    else {
+                        sendMessage(message.channel, "Truths and dares are disabled here");
+                    }
+                } else if (primaryCommand === 'shard') {
+                    sendMessage(message.channel, JSON.stringify(client.shard.ids));
+                } else if (primaryCommand === 'shards') {
+                    sendMessage(message.channel, JSON.stringify(await client.shard.fetchClientValues("readyTimestamp")));
                 } else {
                     if (client.commands.has(primaryCommand)) {
                         client.commands.get(primaryCommand)(args, message, guildSettings);
                     }
                 }
-                switch (primaryCommand) {
-                    case "tod": {
-                        let truthEnabled = guildSettings[message.channel.id]["truth pg"] || guildSettings[message.channel.id]["truth pg13"] || guildSettings[message.channel.id]["truth r"];
-                        let dareEnabled = (guildSettings[message.channel.id]["dare pg"] || guildSettings[message.channel.id]["dare pg13"] || guildSettings[message.channel.id]["dare r"]) && (guildSettings[message.channel.id]["dare irl"] || guildSettings[message.channel.id]["dare d"]);
-                        if (truthEnabled && dareEnabled) {
-                            (Math.random() < 0.5) ? truthCommand(args, message, guildSettings) : dareCommand(args, message, guildSettings);
-                        }
-                        else if (truthEnabled) {
-                            truthCommand(args, message, guildSettings);
-                        }
-                        else if (dareEnabled) {
-                            dareCommand(args, message, guildSettings);
-                        }
-                        else {
-                            sendMessage(message.channel, "Truths and dares are disabled here");
-                        }
-                        break;
-                    }
-                    case "help":
-                        helpCommand(args, message, guildPrefix);
-                        break;
-                    case "truth":
-                    case "t":
-                        client.statistics.truth++;
-                        truthCommand(args, message, guildSettings);
-                        break;
-                    case "dare":
-                    case "d":
-                        client.statistics.dare++;
-                        dareCommand(args, message, guildSettings);
-                        break;
-                    case "wyr":
-                        client.statistics.wyr++;
-                        wyrCommand(args, message, guildSettings);
-                        break;
-                    case "nhie":
-                        client.statistics.nhie++;
-                        nhieCommand(args, message, guildSettings);
-                        break;
-                    case "paranoia":
-                    case "p":
-                        client.statistics.paranoia++;
-                        paranoiaCommand(args, message, guildSettings);
-                        break;
-                    case "random": {
-                        break;
-                    }
-                    case "ans":
-                        sendMessage(message.channel, "You can only use that command in DMs");
-                        break;
-                    case "cp":
-                    case "clearparanoia":
-                        sendMessage(message.channel, "You can only use that command in DMs");
-                        break;
-                    case "links":
-                    case "link":
-                    case "vote":
-                    case "invite":
-                        linkCommand(message);
-                        break;
-                    case "prefix":
-                        prefixCommand(args, message, guildPrefix);
-                        break;
-                    case "en":
-                    case "enable":
-                        enableCommand(args, message, guildSettings, guildPrefix);
-                        break;
-                    case "dis":
-                    case "disable":
-                        disableCommand(args, message, guildSettings, guildPrefix);
-                        break;
-                    case "config":
-                    case "settings":
-                        settingsCommand(args, message, guildSettings);
-                        break;
-                    case "sp":
-                    case "toggleparanoia":
-                    case "showparanoia":
-                        showParanoiaCommand(args, message, guildSettings, guildPrefix);
-                        break;
-                    case "tf":
-                    case "truthful":
-                        truthfulCommand(message, args);
-                        break;
-                    case "ping":
-                        pingCommand(message);
-                        break;
-                    case "stats":
-                        statsCommand(message);
-                        break;
-                    case "shard":
-                        sendMessage(message.channel, JSON.stringify(client.shard.ids));
-                        break;
-                    case "test":
-                        console.log(`Command received: ${fullCommand}`);
-                        break;
-                    case "shards":
-                        sendMessage(message.channel, JSON.stringify(await client.shard.fetchClientValues("readyTimestamp")));
-                        break;
-                    case "m":
-                    case "mute":
-                    case "um":
-                    case "unmute":
-                    case "":
-                        break;
-                }
                 channelTime[message.channel.id] = Date.now();
             }
         }
-        else {
-            switch (primaryCommand) {
-                case "help":
-                    helpCommand(args, message, '+');
-                    break;
-                case "ans":
-                    ansCommand(args, message);
-                    break;
-                case "links":
-                    linkCommand(message);
-                    break;
-                case "clearparanoia":
-                    clearParanoiaCommand(message);
-                    break;
-                default:
-                    sendMessage(message.channel, `${primaryCommand} is not a valid command that can be used in DMs.`);
-                    break;
-            }
-        }
-    }
-    if (!dm) {
-        guildSettings = guildSettings;
-        if (primaryCommand == "mute") {
-            muteCommand(args, message, guildSettings, guildPrefix);
-        }
-        else if (primaryCommand == "unmute") {
-            unmuteCommand(args, message, guildSettings, guildPrefix);
-        }
     }
 }
+
 function sendMessage(channel, messageContent) {
     channel.send(messageContent).catch(() => { console.log("Missing permissions"); });
 }
