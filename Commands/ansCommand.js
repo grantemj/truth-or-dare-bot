@@ -1,6 +1,5 @@
 export { ansCommand };
-import { client, sendMessage } from '../bot.js';
-import { getServerSettings } from '../mongodbFunctions.js';
+import { client, sendMessage, handler } from '../bot.js';
 import { checkUserAns, removeUser } from './paranoiaData.js';
 async function ansCommand(args, message) {
     let checkUser = await checkUserAns(message.author.id);
@@ -9,7 +8,7 @@ async function ansCommand(args, message) {
             sendMessage(message.channel, "You have to provide an answer");
         }
         else {
-            let guildSettings = await getServerSettings(checkUser.guild);
+            let guildSettings = await handler.query("getServerSettings", checkUser.guild);
             if (!guildSettings) {
                 sendMessage("It appears that Truth or Dare is no longer a member of that server, or there has been some other error")
                 return

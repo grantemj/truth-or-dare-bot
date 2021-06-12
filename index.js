@@ -1,6 +1,7 @@
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 require('dotenv').config();
+const fork = require('child_process').fork
 const originalLog = console.log;
 console.log = function (input) {
     let date = new Date();
@@ -8,8 +9,6 @@ console.log = function (input) {
 };
 const { ShardingManager } = require('discord.js-light');
 const manager = new ShardingManager('./bot.js', { token: process.env.TOKEN, execArgv: ["--trace-warnings"], totalShards: parseInt(process.env.TOTALSHARDS), shardList: process.env.SHARDLIST.split(",").map(x => parseInt(x))});
-const os = require('os');
-var logins = 0;
 manager.on('shardCreate', (shard) => {
     console.log(`Launched shard ${shard.id}`);
     shard.on('ready', () => {
@@ -26,6 +25,8 @@ manager.on('shardCreate', (shard) => {
     });
 });
 try {
+    let handlerProcess = fork('./mongodbHandler.js')
+    handlerProcess.on('error', console.error)
     manager.spawn();
 } catch (e) {
     console.log(e)

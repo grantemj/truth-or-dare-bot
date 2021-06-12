@@ -2,6 +2,7 @@ import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 const Discord = require("discord.js-light");
 require('dotenv').config();
+const heapdump = require("heapdump")
 const client = new Discord.Client({
     cacheGuilds: true,
     cacheChannels: false,
@@ -89,12 +90,12 @@ import { truthfulCommand } from './Commands/truthfulCommand.js';
 import { pingCommand } from './Commands/pingCommand.js';
 import { statsCommand } from './Commands/statsCommand.js';
 import { clearParanoiaCommand } from './Commands/clearParanoiaCommand.js';
-import { initiateMongo, getServerSettings, setServerSettings, deleteServerSettings, getPrefix, setPrefix, deletePrefix, getServerCount, updateServerCount, getStatistics, setStatistics } from './mongodbFunctions.js';
-export { Discord, client, fs, TRUTHQUESTIONS, DAREQUESTIONS, WYRQUESTIONS, NHIEQUESTIONS, PARANOIAQUESTIONS, sendMessage, getServerCount, getStatistics };
-initiateMongo().then(async () => {
-    console.log("MongoDB connected")
-    await client.login(process.env.TOKEN).catch(console.error);
-});
+export { Discord, client, fs, TRUTHQUESTIONS, DAREQUESTIONS, WYRQUESTIONS, NHIEQUESTIONS, PARANOIAQUESTIONS, sendMessage, handler };
+import { MongoHandler } from './mongodbFunctions.js'
+const handler = new MongoHandler()
+handler.init().then(() => {
+    client.login(process.env.TOKEN)
+})
 client.on('debug', console.log)
 client.on('ready', () => {
     console.log("Connected");
@@ -119,64 +120,45 @@ client.on('guildCreate', async (guild) => {
         }
     });
 
-    await updateServerCount(client.shard.ids[0], client.guilds.cache.size)
+    handler.query("updateServerCount", client.shard.ids[0], client.guilds.cache.size)
     client.statistics.serversJoined++;
     /* await topggAPI.postStats({
         serverCount: client.guilds.cache.size,
         shardId: client.shard.ids[0],
         shardCount: client.options.shardCount
     }); */
-    await setStatistics(client.shard.ids[0], client.statistics)
+    handler.query("setStatistics", client.shard.ids[0], client.statistics)
 
     console.log("Server count updated for shard " + client.shard.ids[0] + ": " + client.guilds.cache.size);
 
-    await setServerSettings(guild.id, newGuildSettings);
-    await setPrefix(guild.id, '+');
+    handler.query("setServerSettings", guild.id, newGuildSettings);
+    handler.query("setPrefix", guild.id, '+');
 });
 client.on('guildDelete', async (guild) => {
     console.log(`Server left: ${guild.name} (${guild.id})`);
 
-    await updateServerCount(client.shard.ids[0], client.guilds.cache.size)
+    handler.query("updateServerCount", client.shard.ids[0], client.guilds.cache.size)
     client.statistics.serversLeft++;
     /* await topggAPI.postStats({
         serverCount: client.guilds.cache.size,
         shardId: client.shard.ids[0],
         shardCount: client.options.shardCount
     }); */
-    await setStatistics(client.shard.ids[0], client.statistics)
+    handler.query("setStatistics", client.shard.ids[0], client.statistics)
     
     console.log("Server count updated for shard " + client.shard.ids[0] + ": " + client.guilds.cache.size);
     
-    await deleteServerSettings(guild.id);
-    await deletePrefix(guild.id);
-});
-client.on('channelCreate', async (newChannel) => {
-    if (newChannel?.type === "text") {
-        let newGuild = newChannel.guild;
-        let guildSettings = await getServerSettings(newGuild.id);
-        if (guildSettings === undefined || guildSettings === null) {
-            let newGuildSettings = {};
-            newGuild.channels.cache.forEach(channel => {
-                if (channel.type === "text") {
-                    newGuildSettings[channel.id] = defaultSettings;
-                }
-            });
-            await setServerSettings(newGuild.id, newGuildSettings);
-        }
-        else {
-            guildSettings[newChannel.id] = defaultSettings;
-            await setServerSettings(newGuild.id, guildSettings);
-        }
-    }
+    handler.query("deleteServerSettings", guild.id);
+    handler.query("deletePrefix", guild.id);
 });
 client.on('channelDelete', async (channel) => {
     if (channel?.type === "text") {
         let guild = channel.guild;
-        let guildSettings = await getServerSettings(guild.id);
+        let guildSettings = await handler.query("getServerSettings", guild.id);
         if (guildSettings) {
             delete guildSettings[channel.id];
         }
-        await setServerSettings(guild.id, guildSettings);
+        handler.query("setServerSettings", guild.id, guildSettings);
     }
 });
 client.on('message', async (message) => {
@@ -185,9 +167,9 @@ client.on('message', async (message) => {
     }
     if (message.channel.type === "text") {
         let guild = message.guild;
-        let prefix = await getPrefix(guild.id);
+        let prefix = await handler.query("getPrefix", guild.id);
         if (message.content.startsWith(prefix || '+')) {
-            let guildSettings = await getServerSettings(guild.id);
+            let guildSettings = await handler.query("getServerSettings", guild.id);
             if (guildSettings === undefined || guildSettings === null) {
                 console.log("Unindexed guild");
                 let newGuildSettings = {};
@@ -196,13 +178,13 @@ client.on('message', async (message) => {
                         newGuildSettings[channel.id] = defaultSettings;
                     }
                 });
-                await setServerSettings(guild.id, newGuildSettings);
+                handler.query("setServerSettings", guild.id, newGuildSettings);
                 guildSettings = newGuildSettings
             }
             if (!guildSettings.hasOwnProperty(message.channel.id)) {
                 console.log("Unindexed channel");
                 guildSettings[message.channel.id] = defaultSettings;
-                await setServerSettings(guild.id, guildSettings);
+                handler.query("setServerSettings", guild.id, guildSettings);
             }
             processCommand(message, guildSettings, false);
             if (Math.random() < 0.007) {
@@ -223,10 +205,10 @@ client.on('message', async (message) => {
 });
 async function processCommand(message, guildSettings, dm) {
     if (!dm) {
-        var guildPrefix = await getPrefix(message.guild.id);
+        var guildPrefix = await handler.query("getPrefix", message.guild.id);
         if (guildPrefix === undefined) {
             guildPrefix = "+";
-            await setPrefix(message.guild.id, guildPrefix);
+            handler.query("setPrefix", message.guild.id, guildPrefix);
         }
         var fullCommand = message.content.substr(guildPrefix.length);
     }
@@ -421,3 +403,12 @@ async function processCommand(message, guildSettings, dm) {
 function sendMessage(channel, messageContent) {
     channel.send(messageContent).catch(() => { console.log("Missing permissions"); });
 }
+
+var dumps = 0
+setInterval(() => {
+    dumps++
+    console.log(client.shard.ids[0] + " " + process.memoryUsage().heapUsed)
+    heapdump.writeSnapshot("/root/dumps/" + client.shard.ids[0] + "_dump_" + dumps + ".heapsnapshot", () => {
+        console.log("Heap written")
+    })
+}, 200000)

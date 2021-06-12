@@ -1,11 +1,13 @@
 export { unmuteCommand };
 import { sendMessage } from '../bot.js';
-import { setServerSettings } from '../mongodbFunctions.js';
 async function unmuteCommand(args, message, guildSettings, guildPrefix) {
-    let guild = message.guild;
-    let messageMember = await guild.members.fetch(message.author.id, false);
-    await guild.roles.fetch();
-    if (!messageMember.hasPermission('ADMINISTRATOR')) {
+    let guild = message.guild
+    let member = await guild.members.fetch(message.author.id, false)
+    let roles = await Promise.all(member.roles.cache.map(role => guild.roles.fetch(role.id, false)))
+    console.dir(roles)
+    let admin = member.permissions.has("ADMINISTRATOR")
+        || roles.some(role => role.permissions.has("ADMINISTRATOR"))
+    if (!admin) {
         sendMessage(message.channel, "You must be an administrator to use this command.");
     }
     else {
@@ -13,7 +15,7 @@ async function unmuteCommand(args, message, guildSettings, guildPrefix) {
             for (let channel in guildSettings) {
                 guildSettings[channel]["muted?"] = false;
             }
-            await setServerSettings(guild.id, guildSettings);
+            handler.query("setServerSettings", guild.id, guildSettings);
             sendMessage(message.channel, `Unmuted serverwide. Use ${guildPrefix}mute to mute again.`);
         }
         else if (args.length == 0) {
@@ -22,10 +24,9 @@ async function unmuteCommand(args, message, guildSettings, guildPrefix) {
             }
             else {
                 guildSettings[message.channel.id]["muted?"] = false;
-                await setServerSettings(guild.id, guildSettings);
+                handler.query("setServerSettings", guild.id, guildSettings);
                 sendMessage(message.channel, `Unmuted in this channel. Use ${guildPrefix}mute to mute."`);
             }
         }
     }
-    await guild.roles.fetch({ cache: false, force: true });
 }

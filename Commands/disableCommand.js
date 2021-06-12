@@ -2,10 +2,13 @@ export { disableCommand };
 import { sendMessage } from '../bot.js';
 import { settingsChange } from './settingsChange.js';
 async function disableCommand(args, message, guildSettings, serverPrefix) {
-    let guild = message.guild;
-    let messageMember = await guild.members.fetch(message.author.id, false);
-    await messageMember.roles.fetch();
-    if (!messageMember.hasPermission("ADMINISTRATOR")) {
+    let guild = message.guild
+    let member = await guild.members.fetch(message.author.id, false)
+    let roles = await Promise.all(member.roles.cache.map(role => guild.roles.fetch(role.id, false)))
+    console.dir(roles)
+    let admin = member.permissions.has("ADMINISTRATOR")
+        || roles.some(role => role.permissions.has("ADMINISTRATOR"))
+    if (!admin) {
         sendMessage(message.channel, "You must be an administrator to use this command.");
     }
     else if (args.length === 0) {
@@ -71,5 +74,4 @@ async function disableCommand(args, message, guildSettings, serverPrefix) {
             }
         }
     }
-    await messageMember.roles.fetch({ cache: false, force: true });
 }

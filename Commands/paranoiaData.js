@@ -1,10 +1,10 @@
 export { checkUserParanoia, addUser, checkUserAns, removeUser };
-import { getParanoiaData, setParanoiaData, deleteParanoiaData } from '../mongodbFunctions.js';
+import { handler } from '../bot.js';
 async function checkUserParanoia(user, guild) {
     if (user === undefined) {
         return false;
     }
-    let userData = await getParanoiaData(user);
+    let userData = await handler.query("getParanoiaData", user);
     if (userData) {
         return userData.some((a) => { a.guild === guild; });
     }
@@ -13,19 +13,19 @@ async function checkUserParanoia(user, guild) {
     }
 }
 async function addUser(user, guild, channel, question) {
-    let userData = await getParanoiaData(user);
+    let userData = await handler.query("getParanoiaData", user);
     if (userData) {
         userData.push(new ParanoiaQuestion(user, guild, channel, question));
-        await setParanoiaData(user, userData);
+        handler.query("setParanoiaData", user, userData);
     }
     else {
         let newUserData = [];
         newUserData.push(new ParanoiaQuestion(user, guild, channel, question));
-        await setParanoiaData(user, newUserData);
+        handler.query("setParanoiaData", user, newUserData);
     }
 }
 async function checkUserAns(user) {
-    let userData = await getParanoiaData(user);
+    let userData = await handler.query("getParanoiaData", user);
     if (Array.isArray(userData)) {
         if (userData[0] === undefined || !userData[0].hasOwnProperty("time")) {
         }
@@ -34,11 +34,11 @@ async function checkUserAns(user) {
                 userData.shift();
             }
             if (userData[0]) {
-                await setParanoiaData(user, userData);
+                handler.query("setParanoiaData", user, userData);
                 return userData[0];
             }
             else {
-                await removeUser(user);
+                handler.query("removeUser", user);
                 return undefined;
             }
         }
@@ -48,13 +48,13 @@ async function checkUserAns(user) {
     }
 }
 async function removeUser(user) {
-    let userData = await getParanoiaData(user);
+    let userData = await handler.query("getParanoiaData", user);
     userData.shift();
     if (userData.length === 0) {
-        await deleteParanoiaData(user);
+        handler.query("deleteParanoiaData", user);
     }
     else {
-        await setParanoiaData(user, userData);
+        handler.query("setParanoiaData", user, userData);
     }
 }
 class ParanoiaQuestion {

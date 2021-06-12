@@ -1,10 +1,10 @@
 export { statsCommand };
-import { client, Discord, sendMessage, getServerCount, getStatistics } from '../bot.js';
+import { client, Discord, sendMessage, handler } from '../bot.js';
 async function statsCommand(message) {
-    let serverCount = await getServerCount();
+    let serverCount = await handler.query("getServerCount");
     // let upvoteCount = (await topggAPI.getBot("692045914436796436")).monthlyPoints;
     let upvoteCount = "∞"
-    let statistics = await getStatistics()
+    let statistics = await handler.query("getStatistics")
     let serverDifference = statistics.serversJoined - statistics.serversLeft;
     let statsEmbed = new Discord.MessageEmbed()
         .setColor("#e91e62")

@@ -1,5 +1,5 @@
 export { settingsChange };
-import { setServerSettings } from '../mongodbFunctions.js';
+import { handler } from '../bot.js';
 async function settingsChange(message, guildSettings, settingNames, server, value) {
     if (server) {
         for (let channel in guildSettings) {
@@ -12,7 +12,7 @@ async function settingsChange(message, guildSettings, settingNames, server, valu
                 }
             }
         }
-        await setServerSettings(message.guild.id, guildSettings);
+        handler.query("setServerSettings", message.guild.id, guildSettings);
     }
     else {
         for (let settingName of settingNames) {
@@ -23,6 +23,6 @@ async function settingsChange(message, guildSettings, settingNames, server, valu
                 guildSettings[message.channel.id][settingName] = value;
             }
         }
-        await setServerSettings(message.guild.id, guildSettings);
+        handler.query("setServerSettings", message.guild.id, guildSettings);
     }
 }
