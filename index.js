@@ -8,7 +8,14 @@ console.log = function (input) {
     originalLog(`${(date.getHours() >= 10) ? date.getHours() : "0" + date.getHours()}:${(date.getMinutes() >= 10) ? date.getMinutes() : "0" + date.getMinutes()}:${(date.getSeconds() >= 10) ? date.getSeconds() : "0" + date.getSeconds()}    ${input}`);
 };
 const { ShardingManager } = require('discord.js-light');
-const manager = new ShardingManager('./bot.js', { token: process.env.TOKEN, execArgv: ["--trace-warnings"], totalShards: parseInt(process.env.TOTALSHARDS), shardList: process.env.SHARDLIST.split(",").map(x => parseInt(x))});
+
+const manager = new ShardingManager('./bot.js', {
+    token: process.env.TOKEN,
+    respawn: true,
+    execArgv: ["--trace-warnings"],
+    totalShards: parseInt(process.env.TOTALSHARDS),
+    shardList: process.env.SHARDLIST.split(",").map(x => parseInt(x))
+});
 manager.on('shardCreate', (shard) => {
     console.log(`Launched shard ${shard.id}`);
     shard.on('ready', () => {
@@ -25,6 +32,7 @@ manager.on('shardCreate', (shard) => {
     });
 });
 try {
+
     let handlerProcess = fork('./mongodbHandler.js')
     handlerProcess.on('error', console.error)
     manager.spawn();
