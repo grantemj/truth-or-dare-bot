@@ -1,11 +1,9 @@
-export { dareCommand };
+export { Command, SlashCommand, Meta };
 import { DAREQUESTIONS, sendMessage } from '../bot.js';
 var questionLog = {};
-function dareCommand(args, message, guildSettings) {
-    var index = undefined;
+function Command(args, message, channelSettings, prefix) {
+    var index;
     var guild = message.guild;
-    var channelSettings = guildSettings[message.channel.id]
-    if (!channelSettings) return
     if (args.length > 2) {
         sendMessage(message.channel, "You can only specify one rating (pg, pg13, r) and/or one type (d, irl).");
     }
@@ -34,7 +32,7 @@ function dareCommand(args, message, guildSettings) {
             }
         }
         if (categories.length === 0) {
-            sendMessage(message.channel, "Dare questions are disabled here. To enable them, use `+enable dare`.");
+            sendMessage(message.channel, `Dare questions are disabled here. To enable them, use \`${prefix}enable dare\``);
         }
         else {
             let category = categories[Math.floor(Math.random() * categories.length)];
@@ -66,10 +64,10 @@ function dareCommand(args, message, guildSettings) {
                         sendMessage(message.channel, DAREQUESTIONS[(args[0] + "_" + type)][index]);
                     }
                     else {
-                        sendMessage(message.channel, "Dare questions are disabled here. To enable them, use `+enable dare`.");
+                        sendMessage(message.channel, `Dare questions are disabled here. To enable them, use \`${prefix}enable dare\``);
                     }
                 } else {
-                    sendMessage(message.channel, "That rating is disabled here. To enable it, use `+enable dare " + args[0] + "`")
+                    sendMessage(message.channel, `That rating is disabled here. To enable it, use \`${prefix}enable dare ${args[0]}\``)
                 }
             }
             else if (["d", "irl"].includes(args[0])) {
@@ -92,10 +90,10 @@ function dareCommand(args, message, guildSettings) {
                         sendMessage(message.channel, DAREQUESTIONS[(rating + "_" + args[0])][index]);
                     }
                     else {
-                        sendMessage(message.channel, "Dare questions are disabled here. To enable them, use `+enable dare`.");
+                        sendMessage(message.channel, `Dare questions are disabled here. To enable them, use \`${prefix}enable dare\``);
                     }
                 } else {
-                    sendMessage(message.channel, "That type is disabled here. To enable it, use `+enable dare " + args[0] + "`")
+                    sendMessage(message.channel, `That type is disabled here. To enable it, use \`${prefix}enable dare ${args[0]}\``)
                 }
             }
         }
@@ -125,10 +123,10 @@ function dareCommand(args, message, guildSettings) {
                 type = args[0];
             }
             if (!channelSettings[("dare " + rating)]) {
-                sendMessage(message.channel, "That rating is disabled here. To enable it, use `+enable dare " + rating + "`");
+                sendMessage(message.channel, `That rating is disabled here. To enable it, use \`${prefix}enable dare ${rating}\``);
             }
             else if (!channelSettings[("dare " + type)]) {
-                sendMessage(message.channel, "That type is disabled here. To enable it, use `+enable dare " + type + "`");
+                sendMessage(message.channel, `That type is disabled here. To enable it, use \`${prefix}enable dare ${type}\``);
             }
             else {
                 do {
@@ -147,4 +145,105 @@ function dareCommand(args, message, guildSettings) {
     if (index) {
         questionLog[guild.id].push(index);
     }
+}
+
+function SlashCommand(interaction, channelSettings) {
+    var index;
+    var { guild, options } = interaction
+
+    var rating, type
+
+    if (options.has('rating')) {
+        if (!channelSettings["dare " + options.get('rating').value]) {
+            interaction.editReply("That rating is disabled here")
+            return
+        } else {
+            rating = options.get('rating').value
+        }
+    } else {
+        let ratings = [];
+        if (channelSettings["dare pg"]) {
+            ratings.push("pg");
+        }
+        if (channelSettings["dare pg13"]) {
+            ratings.push("pg13");
+        }
+        if (channelSettings["dare r"]) {
+            ratings.push("r");
+        }
+
+        if (ratings.length === 0) {
+            interaction.editReply("All dare ratings are disabled here")
+            return
+        } else {
+            rating = ratings[Math.floor(Math.random() * ratings.length)]
+        }
+    }
+
+    if (options.has('type')) {
+        if (!channelSettings["dare " + options.get('type').value]) {
+            interaction.editReply("That type is disabled here")
+            return
+        } else {
+            type = options.get('type').value
+        }
+    } else {
+        let types = [];
+        if (channelSettings["dare d"]) {
+            types.push("d");
+        }
+        if (channelSettings["dare irl"]) {
+            types.push("irl");
+        }
+
+        if (types.length === 0) {
+            interaction.editReply("All dare types are disabled here")
+            return
+        } else {
+            type = types[Math.floor(Math.random() * types.length)]
+        }
+    }
+
+    do {
+        index = Math.floor(Math.random() * DAREQUESTIONS[rating + "_" + type].length);
+    } while (questionLog[guild.id]?.includes(index));
+    interaction.editReply(DAREQUESTIONS[rating + "_" + type][index])
+    
+    if (!(guild.id in questionLog)) {
+        questionLog[guild.id] = [];
+    }
+    if (questionLog[guild.id].length > 30) {
+        questionLog[guild.id].shift();
+    }
+    if (index) {
+        questionLog[guild.id].push(index);
+    }
+}
+
+const Meta = {
+    name: 'dare',
+    description: "Gives a dare that has to be completed",
+    options: [
+        {
+            name: 'rating',
+            description: "The maturity level of the topics the question can relate to",
+            type: "STRING",
+            required: false,
+            choices: [
+                { name: "pg", value: "pg" },
+                { name: "pg13", value: "pg13" },
+                { name: "r", value: "r" }
+            ]
+        },
+        {
+            name: 'type',
+            description: "Whether the dare can be completed digitally or in real life",
+            type: "STRING",
+            required: false,
+            choices: [
+                { name: "d", value: "d" },
+                { name: "irl", value: "irl" }
+            ]
+        }
+    ]
 }
