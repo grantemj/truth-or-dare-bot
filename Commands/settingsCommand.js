@@ -45,7 +45,7 @@ async function SlashCommand(interaction, channelSettings) {
             return
         }
 
-        let channelID = options.get('channel').channel.Discord
+        let channelID = options.get('channel').channel.channelID
         let cs = await handler.query('getChannelSettings', channelID)
 
         var settingsEmbed = new Discord.MessageEmbed()

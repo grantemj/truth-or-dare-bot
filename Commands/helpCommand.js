@@ -117,7 +117,7 @@ function Command(args, message, channelSettings, prefix) {
             case "settings":
                 sendMessage(message.channel, createHelpEmbed('#e73c3b', 'Settings command', [
                     { name: '__Aliases__', value: `\`${prefix}settings\`, \`${prefix}config\``},
-                    { name: '__Usage__', value: `**${prefix}settings**: Lists current settings both serverwide and in the channel the message was sent. If a category is not shown, it is enabled by default.` }
+                    { name: '__Usage__', value: `**${prefix}settings**: Lists the settings for the current channel.` }
                 ], prefix))
                 break;
             case "en":
@@ -269,7 +269,7 @@ function SlashCommand(interaction, channelSettings) {
                 break;
             case "settings":
                 interaction.editReply(createHelpEmbed('#e73c3b', 'Settings command', [
-                    { name: '__Usage__', value: `**/settings**: Lists current settings both serverwide and in the channel the message was sent. If a category is not shown, it is enabled by default.` }
+                    { name: '__Usage__', value: `**/settings [channel]**: Lists the settings for the specified channel.` }
                 ], '/'))
                 break;
             case "enable":
@@ -291,9 +291,15 @@ function SlashCommand(interaction, channelSettings) {
                 break;
             case "unmute":
                 interaction.editReply(createHelpEmbed('#e73c3b', 'Unmute command', [
-                    { name: '__Usage__', value: `**/unmute \n Used to unmute the bot in the channel the message was sent. When muted, the bot will not respond to any commands.` }
+                    { name: '__Usage__', value: `**/unmute**: Used to unmute the bot in the channel the message was sent. When muted, the bot will not respond to any commands.` }
                 ], '/'))
                 break;
+            case "admin":
+                interaction.editReply(createHelpEmbed('#e73c3b', 'Admin command', [
+                    { name: '__Usage__', value: `**/admin [set/remove] [role]**: Used to set/remove a role as an admin (can use certain slash commands, does NOT have anything to do with the Administrator setting on roles in Discord)` },
+                    { name: '__Arguments__', value: `**set/remove**: Whether to set or remove admin permissions from a role\n**role**: The role to set/remove as an admin` }
+                ], '/'))
+                break
             case "showparanoia":
                 interaction.editReply(createHelpEmbed('#e73c3b', "Show Paranoia Command", [
                     { name: '__Usage__', value: `**/showparanoia**: Toggles between only 50% of paranoia questions being shown (intended use) and all of them.` }
