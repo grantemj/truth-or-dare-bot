@@ -1,7 +1,11 @@
-export { Command, SlashCommand, Meta };
+export { Command, SlashCommand, Meta, Aliases };
 import { PARANOIAQUESTIONS, sendMessage } from '../bot.js';
 import { checkUserParanoia, addUser } from './paranoiaData.js';
+
+const Aliases = ["p"]
+
 var questionLog = {};
+
 async function Command(args, message, channelSettings, prefix) {
     var index;
     var { guild } = message

@@ -1,5 +1,8 @@
-export { Command, SlashCommand, Meta };
+export { Command, SlashCommand, Meta, Aliases };
 import { Discord, sendMessage } from '../bot.js';
+
+const Aliases = ["h"]
+
 function Command(args, message, channelSettings, prefix) {
     if (args.length == 0) {
         sendMessage(message.channel, createHelpEmbed("#3498da", 'Commands:', [
@@ -39,10 +42,16 @@ function Command(args, message, channelSettings, prefix) {
                     { name: `__${prefix}stats__`, value: 'Lists various measures and statistics about the bot and its performance.' }
                 ], prefix))
                 break;
+            case "help": 
+                sendMessage(message.channel, createHelpEmbed('#3498da', 'Help command', [
+                    { name: '__Aliases__', value: `\`${prefix}help\`, \`${prefix}h\`` },
+                    { name: '__Usage__', value: `**${prefix}help [command]**: Gives info about a specific command` }
+                ], prefix))
+                break
             case "truth":
             case "t":
                 sendMessage(message.channel, createHelpEmbed('#e67e21', 'Truth command', [
-                    { name: '__Aliases', value: `\`${prefix}truth\`, \`${prefix}t\``},
+                    { name: '__Aliases__', value: `\`${prefix}truth\`, \`${prefix}t\``},
                     { name: '__Usage__', value: `**${prefix}truth [rating]**: Gives a random question that has to be answered truthfully` },
                     { name: '__Arguments__', value: '**pg**: Gives a \'PG\' question (no inappropriate content)\n**pg13**: Gives a \'PG13\' rated question (may be suggestive, many have to with dating/relationships.)\n**r**: Gives a "R" rated question (most likely overtly sexual)' }
                 ], prefix))
@@ -50,21 +59,21 @@ function Command(args, message, channelSettings, prefix) {
             case "dare":
             case "d":
                 sendMessage(message.channel, createHelpEmbed('#e67e21', 'Dare command', [
-                    { name: '__Aliases', value: `\`${prefix}dare\`, \`${prefix}d\``},
+                    { name: '__Aliases__', value: `\`${prefix}dare\`, \`${prefix}d\``},
                     { name: '__Usage__', value: `**${prefix}dare [rating] [type]**: Gives a dare that has to be completed.` },
                     { name: '__Arguments__', value: '**d**: Gives a dare that is done over the internet or on a device\n**irl**: Gives a dare that is done in real life/in person\n**pg**: Gives a "PG" dare (no inappropriate content)\n**pg13**: Gives a "PG-13" dare (may be suggestive, many have to with dating/relationships.)\n**r**: Gives a "R" rated dare (most likely overtly sexual)' }
                 ], prefix))
                 break;
             case "wyr":
                 sendMessage(message.channel, createHelpEmbed('#f1c40e', "Would You Rather command", [
-                    { name: '__Aliases', value: `\`${prefix}wyr\``},
+                    { name: '__Aliases__', value: `\`${prefix}wyr\``},
                     { name: '__Usage__', value: `**${prefix}wyr [rating]**: Gives a 'Would You Rather' question that has to be answered.` },
                     { name: '__Arguments__', value: '**pg**: Gives a "PG" question (no inappropriate content)\n**pg13**: Gives a "PG-13" question (may be suggestive, many have to with dating/relationships.)\n**r**: Gives a "R" rated question (most likely overtly sexual)' }
                 ], prefix))
                 break;
             case "nhie":
                 sendMessage(message.channel, createHelpEmbed('#2ecc70', "Never Have I Ever command", [
-                    { name: '__Aliases', value: `\`${prefix}nhie\``},
+                    { name: '__Aliases__', value: `\`${prefix}nhie\``},
                     { name: '__Usage__', value: `**${prefix}nhie [rating]**: Gives a 'Never Have I Ever' question that has to be answered.` },
                     { name: '__Arguments__', value: '**pg**: Gives a "PG" question (no inappropriate content)\n**pg13**: Gives a "PG-13" question (may be suggestive, many have to with dating/relationships.)\n**r**: Gives a "R" rated question (most likely overtly sexual)' }
                 ], prefix))
@@ -72,14 +81,14 @@ function Command(args, message, channelSettings, prefix) {
             case "paranoia":
             case "p":
                 sendMessage(message.channel, createHelpEmbed('#9b59b5', 'Paranoia command', [
-                    { name: '__Aliases', value: `\`${prefix}paranoia\`, \`${prefix}p\``},
+                    { name: '__Aliases__', value: `\`${prefix}paranoia\`, \`${prefix}p\``},
                     { name: '__Usage__', value: `**${prefix}paranoia [target] [rating]**: Sends a paranoia question to the target. Select the target by @ing them.` },
                     { name: '__Arguments__', value: '**pg**: Gives a "PG" question (no inappropriate content)\n**pg13**: Gives a "PG-13" question (may be suggestive, many have to with dating/relationships.)\n**r**: Gives a "R" rated question (most likely overtly sexual)' }
                 ], message, prefix))
                 break;
             case "ans":
                 sendMessage(message.channel, createHelpEmbed('#9b59b5', 'Answer command', [
-                    { name: '__Aliases', value: `\`${prefix}ans\``},
+                    { name: '__Aliases__', value: `\`${prefix}ans\`, \`${prefix}\`a`},
                     { name: '__Usage__', value: `**${prefix}ans [answer]**: Used to answer a paranoia question, can only be used in DMs. The brackets are placeholders and represent an argument, it is not required to enclose your answer in brackets. Example: Use \'${prefix}ans John\', not \'${prefix}ans [John]\'.` }
                 ], prefix))
                 break;
@@ -88,33 +97,33 @@ function Command(args, message, channelSettings, prefix) {
             case "vote":
             case "invite":
                 sendMessage(message.channel, createHelpEmbed('#e91e62', 'Links command', [
-                    { name: '__Aliases', value: `\`${prefix}links\`, \`${prefix}link\`, \`${prefix}vote\`, \`${prefix}invite\``},
+                    { name: '__Aliases__', value: `\`${prefix}links\`, \`${prefix}link\`, \`${prefix}vote\`, \`${prefix}invite\``},
                     { name: '__Usage__', value: `**${prefix}links**: Gives various links related to the bot, including the question submit form, feedback form, support server, how to add the bot to your own server, and more.` }
                 ], prefix))
                 break;
             case "stats":
                 sendMessage(message.channel, createHelpEmbed("#e91e62", "Stats Command", [
-                    { name: '__Aliases', value: `\`${prefix}stats\`, \`${prefix}s\``},
+                    { name: '__Aliases__', value: `\`${prefix}stats\`, \`${prefix}s\``},
                     { name: '__Usage__', value: `**${prefix}stats**: +stats: Lists various measures and statistics about the bot and its performance.` }
                 ], prefix))
                 break;
             case "prefix":
                 sendMessage(message.channel, createHelpEmbed('#e73c3b', 'Prefix command', [
-                    { name: '__Aliases', value: `\`${prefix}truth\`, \`${prefix}t\``},
+                    { name: '__Aliases__', value: `\`${prefix}prefix\``},
                     { name: '__Usage__', value: `**${prefix}prefix [new prefix] [infix space]**: Used to set a new prefix for the bot. Standard '+' prefix will be used in DMs. New prefix must either contain +, !, $, %, ^, &, -, <, or >, or be between 4 and 8 characters long. By default, the bot will expect no space between the prefix and a command (ex. \`+truth\`). If you want an infix space (ex. \`tod truth\`), use \`${prefix}prefix [new prefix] s\`.` }
                 ], prefix))
                 break;
             case "config":
             case "settings":
                 sendMessage(message.channel, createHelpEmbed('#e73c3b', 'Settings command', [
-                    { name: '__Aliases', value: `\`${prefix}settings\`, \`${prefix}config\``},
+                    { name: '__Aliases__', value: `\`${prefix}settings\`, \`${prefix}config\``},
                     { name: '__Usage__', value: `**${prefix}settings**: Lists current settings both serverwide and in the channel the message was sent. If a category is not shown, it is enabled by default.` }
                 ], prefix))
                 break;
             case "en":
             case "enable":
                 sendMessage(message.channel, createHelpEmbed('#e73c3b', 'Enable command', [
-                    { name: '__Aliases', value: `\`${prefix}enable\`, \`${prefix}en\``},
+                    { name: '__Aliases__', value: `\`${prefix}enable\`, \`${prefix}en\``},
                     { name: '__Usage__', value: `**${prefix}enable [command] [rating]**: Enables the command/rating specified.` },
                     { name: '__Arguments__', value: '**server**: Enables serverwide. If this argument is absent, the command/category will be enabled only in the channel the message was sent.\n**pg**: Enables pg category for all commands, or can be added after a command to enable for that command only.\n**pg13**: Enables pg13 category for all commands, or can be added after a command to enable for that command only.\n**r**: Enables r category for all commands, or can be added after a command to enable for that command only.\n**d**: Enables digital category for the dare command.\n**irl**: Enables real life category for the dare command.\n**truth**: Enables all categories for the truth command.\n**dare**: Enables all categories for the dare command.\n**wyr**: Enables all categories for the Would You Rather command.\n**nhie**: Enables all categories for the Never Have I Ever command.\n**paranoia**: Enables all categories for the paranoia command.' }
                 ], prefix))
@@ -122,7 +131,7 @@ function Command(args, message, channelSettings, prefix) {
             case "dis":
             case "disable":
                 sendMessage(message.channel, createHelpEmbed('#e73c3b', 'Disable command', [
-                    { name: '__Aliases', value: `\`${prefix}disable\`, \`${prefix}dis\``},
+                    { name: '__Aliases__', value: `\`${prefix}disable\`, \`${prefix}dis\``},
                     { name: '__Usage__', value: `**${prefix}disable [command] [rating]**: Disables the command/rating specified.` },
                     { name: '__Arguments__', value: '**server**: Disables serverwide. If this argument is absent, the command/category will be disabled only in the channel the message was sent.\n**pg**: Disables pg category for all commands, or can be added after a command to disable for that command only.\n**pg13**: Disables pg13 category for all commands, or can be added after a command to disable for that command only.\n**r**: Disables r category for all commands, or can be added after a command to disable for that command only.\n**d**: Disables digital category for the dare command.\n**irl**: Disables real life category for the dare command.\n**truth**: Disables all categories for the truth command.\n**dare**: Disables all categories for the dare command.\n**wyr**: Disables all categories for the Would You Rather command.\n**nhie**: Disables all categories for the Never Have I Ever command.\n**paranoia**: Disables all categories for the paranoia command.' }
                 ], prefix))
@@ -130,42 +139,41 @@ function Command(args, message, channelSettings, prefix) {
             case "m":
             case "mute":
                 sendMessage(message.channel, createHelpEmbed('#e73c3b', 'Mute command', [
-                    { name: '__Aliases', value: `\`${prefix}mute\`, \`${prefix}m\``},
+                    { name: '__Aliases__', value: `\`${prefix}mute\`, \`${prefix}m\``},
                     { name: '__Usage__', value: `**${prefix}mute**: Used to mute the bot in the channel the message was sent. When muted, the bot will not respond to any commands.` }
                 ], prefix))
                 break;
             case "um":
             case "unmute":
                 sendMessage(message.channel, createHelpEmbed('#e73c3b', 'Unmute command', [
-                    { name: '__Aliases', value: `\`${prefix}unmute\`, \`${prefix}um\``},
+                    { name: '__Aliases__', value: `\`${prefix}unmute\`, \`${prefix}um\``},
                     { name: '__Usage__', value: `**${prefix}unmute \n Used to unmute the bot in the channel the message was sent. When muted, the bot will not respond to any commands.` }
                 ], prefix))
                 break;
             case "sp":
-            case "toggleparanoia":
             case "showparanoia":
                 sendMessage(message.channel, createHelpEmbed('#e73c3b', "Show Paranoia Command", [
-                    { name: '__Aliases', value: `\`${prefix}showparanoia\`, \`${prefix}toggleparanoia\`, \`${prefix}sp\``},
+                    { name: '__Aliases__', value: `\`${prefix}showparanoia\`, \`${prefix}toggleparanoia\`, \`${prefix}sp\``},
                     { name: '__Usage__', value: `**${prefix}showparanoia**: Toggles between only 50% of paranoia questions being shown (intended use) and all of them.` }
                 ], prefix))
                 break;
-            case "cp":
-            case "clearparanoia":
+            case "c":
+            case "clear":
                 sendMessage(message.channel, createHelpEmbed('#e73c3b', "Clear Paranoia Command", [
-                    { name: '__Aliases', value: `\`${prefix}clearparanoia\`, \`${prefix}cp\``},
+                    { name: '__Aliases__', value: `\`${prefix}clearparanoia\`, \`${prefix}cp\``},
                     { name: '__Usage__', value: `**${prefix}clearparanoia**: Deletes the unanswered paranoia questions, can only be used in DMs.` }
                 ], prefix))
                 break;
             case "tf":
             case "truthful":
                 sendMessage(message.channel, createHelpEmbed("#e67e21", "Truthful Command", [
-                    { name: '__Aliases', value: `\`${prefix}truthful\`, \`${prefix}tf\``},
+                    { name: '__Aliases__', value: `\`${prefix}truthful\`, \`${prefix}tf\``},
                     { name: '__Usage__', value: `**${prefix}truthful [target]**: Uses semi-quasi-pseudo-random procedures to tell you how truthful a user is while answering questions.` }
                 ], prefix))
                 break;
             case "ping":
                 sendMessage(message.channel, createHelpEmbed("#e73c3", "Ping Command", [
-                    { name: '__Aliases', value: `\`${prefix}ping\``},
+                    { name: '__Aliases__', value: `\`${prefix}ping\``},
                     { name: '__Usage__', value: `**${prefix}ping**: Displays the average ping between the bot and Discord's webservers.` }
                 ], prefix))
                 break;
@@ -183,7 +191,7 @@ function SlashCommand(interaction, channelSettings) {
             { name: `__Control Commands__`, value: `/help c: Commands used to control how the bot functions or change settings (enable, mute, prefix, etc.)` }
         ], '/'))
     } else {
-        let command = interaction.options.get('command')
+        let command = interaction.options.get('command').value
         switch(command) {
             case "q":
                 interaction.editReply(createHelpEmbed('#3498da', 'Question Commands:', [
@@ -210,133 +218,99 @@ function SlashCommand(interaction, channelSettings) {
                     { name: `__/stats__`, value: 'Lists various measures and statistics about the bot and its performance.' }
                 ], '/'))
                 break;
+            case "help":
+                interaction.editReply(createHelpEmbed('#3498da', 'Help command', [
+                    { name: '__Usage__', value: `**/help [command]**: Gives info about a specific command` }
+                ], '/'))
             case "truth":
-            case "t":
                 interaction.editReply(createHelpEmbed('#e67e21', 'Truth command', [
-                    { name: '__Aliases', value: `\`/truth\`, \`/t\``},
                     { name: '__Usage__', value: `**/truth [rating]**: Gives a random question that has to be answered truthfully` },
                     { name: '__Arguments__', value: '**pg**: Gives a \'PG\' question (no inappropriate content)\n**pg13**: Gives a \'PG13\' rated question (may be suggestive, many have to with dating/relationships.)\n**r**: Gives a "R" rated question (most likely overtly sexual)' }
                 ], '/'))
                 break;
             case "dare":
-            case "d":
                 interaction.editReply(createHelpEmbed('#e67e21', 'Dare command', [
-                    { name: '__Aliases', value: `\`/dare\`, \`/d\``},
                     { name: '__Usage__', value: `**/dare [rating] [type]**: Gives a dare that has to be completed.` },
                     { name: '__Arguments__', value: '**d**: Gives a dare that is done over the internet or on a device\n**irl**: Gives a dare that is done in real life/in person\n**pg**: Gives a "PG" dare (no inappropriate content)\n**pg13**: Gives a "PG-13" dare (may be suggestive, many have to with dating/relationships.)\n**r**: Gives a "R" rated dare (most likely overtly sexual)' }
                 ], '/'))
                 break;
             case "wyr":
                 interaction.editReply(createHelpEmbed('#f1c40e', "Would You Rather command", [
-                    { name: '__Aliases', value: `\`/wyr\``},
                     { name: '__Usage__', value: `**/wyr [rating]**: Gives a 'Would You Rather' question that has to be answered.` },
                     { name: '__Arguments__', value: '**pg**: Gives a "PG" question (no inappropriate content)\n**pg13**: Gives a "PG-13" question (may be suggestive, many have to with dating/relationships.)\n**r**: Gives a "R" rated question (most likely overtly sexual)' }
                 ], '/'))
                 break;
             case "nhie":
                 interaction.editReply(createHelpEmbed('#2ecc70', "Never Have I Ever command", [
-                    { name: '__Aliases', value: `\`/nhie\``},
                     { name: '__Usage__', value: `**/nhie [rating]**: Gives a 'Never Have I Ever' question that has to be answered.` },
                     { name: '__Arguments__', value: '**pg**: Gives a "PG" question (no inappropriate content)\n**pg13**: Gives a "PG-13" question (may be suggestive, many have to with dating/relationships.)\n**r**: Gives a "R" rated question (most likely overtly sexual)' }
                 ], '/'))
                 break;
             case "paranoia":
-            case "p":
                 interaction.editReply(createHelpEmbed('#9b59b5', 'Paranoia command', [
-                    { name: '__Aliases', value: `\`/paranoia\`, \`/p\``},
                     { name: '__Usage__', value: `**/paranoia [target] [rating]**: Sends a paranoia question to the target. Select the target by @ing them.` },
                     { name: '__Arguments__', value: '**pg**: Gives a "PG" question (no inappropriate content)\n**pg13**: Gives a "PG-13" question (may be suggestive, many have to with dating/relationships.)\n**r**: Gives a "R" rated question (most likely overtly sexual)' }
                 ], '/'))
                 break;
             case "ans":
                 interaction.editReply(createHelpEmbed('#9b59b5', 'Answer command', [
-                    { name: '__Aliases', value: `\`/ans\``},
                     { name: '__Usage__', value: `**/ans [answer]**: Used to answer a paranoia question, can only be used in DMs. The brackets are placeholders and represent an argument, it is not required to enclose your answer in brackets. Example: Use \'/ans John\', not \'/ans [John]\'.` }
                 ], '/'))
                 break;
             case "links":
-            case "link":
-            case "vote":
-            case "invite":
                 interaction.editReply(createHelpEmbed('#e91e62', 'Links command', [
-                    { name: '__Aliases', value: `\`/links\`, \`/link\`, \`/vote\`, \`/invite\``},
                     { name: '__Usage__', value: `**/links**: Gives various links related to the bot, including the question submit form, feedback form, support server, how to add the bot to your own server, and more.` }
                 ], '/'))
                 break;
             case "stats":
                 interaction.editReply(createHelpEmbed("#e91e62", "Stats Command", [
-                    { name: '__Aliases', value: `\`/stats\`, \`/s\``},
                     { name: '__Usage__', value: `**/stats**: +stats: Lists various measures and statistics about the bot and its performance.` }
                 ], '/'))
                 break;
-            case "prefix":
-                interaction.editReply(createHelpEmbed('#e73c3b', 'Prefix command', [
-                    { name: '__Aliases', value: `\`/truth\`, \`/t\``},
-                    { name: '__Usage__', value: `**/prefix [new prefix] [infix space]**: Used to set a new prefix for the bot. Standard '+' prefix will be used in DMs. New prefix must either contain +, !, $, %, ^, &, -, <, or >, or be between 4 and 8 characters long. By default, the bot will expect no space between the prefix and a command (ex. \`+truth\`). If you want an infix space (ex. \`tod truth\`), use \`/prefix [new prefix] s\`.` }
-                ], '/'))
-                break;
-            case "config":
             case "settings":
                 interaction.editReply(createHelpEmbed('#e73c3b', 'Settings command', [
-                    { name: '__Aliases', value: `\`/settings\`, \`/config\``},
                     { name: '__Usage__', value: `**/settings**: Lists current settings both serverwide and in the channel the message was sent. If a category is not shown, it is enabled by default.` }
                 ], '/'))
                 break;
-            case "en":
             case "enable":
                 interaction.editReply(createHelpEmbed('#e73c3b', 'Enable command', [
-                    { name: '__Aliases', value: `\`/enable\`, \`/en\``},
                     { name: '__Usage__', value: `**/enable [command] [rating]**: Enables the command/rating specified.` },
                     { name: '__Arguments__', value: '**server**: Enables serverwide. If this argument is absent, the command/category will be enabled only in the channel the message was sent.\n**pg**: Enables pg category for all commands, or can be added after a command to enable for that command only.\n**pg13**: Enables pg13 category for all commands, or can be added after a command to enable for that command only.\n**r**: Enables r category for all commands, or can be added after a command to enable for that command only.\n**d**: Enables digital category for the dare command.\n**irl**: Enables real life category for the dare command.\n**truth**: Enables all categories for the truth command.\n**dare**: Enables all categories for the dare command.\n**wyr**: Enables all categories for the Would You Rather command.\n**nhie**: Enables all categories for the Never Have I Ever command.\n**paranoia**: Enables all categories for the paranoia command.' }
                 ], '/'))
                 break;
-            case "dis":
             case "disable":
                 interaction.editReply(createHelpEmbed('#e73c3b', 'Disable command', [
-                    { name: '__Aliases', value: `\`/disable\`, \`/dis\``},
                     { name: '__Usage__', value: `**/disable [command] [rating]**: Disables the command/rating specified.` },
                     { name: '__Arguments__', value: '**server**: Disables serverwide. If this argument is absent, the command/category will be disabled only in the channel the message was sent.\n**pg**: Disables pg category for all commands, or can be added after a command to disable for that command only.\n**pg13**: Disables pg13 category for all commands, or can be added after a command to disable for that command only.\n**r**: Disables r category for all commands, or can be added after a command to disable for that command only.\n**d**: Disables digital category for the dare command.\n**irl**: Disables real life category for the dare command.\n**truth**: Disables all categories for the truth command.\n**dare**: Disables all categories for the dare command.\n**wyr**: Disables all categories for the Would You Rather command.\n**nhie**: Disables all categories for the Never Have I Ever command.\n**paranoia**: Disables all categories for the paranoia command.' }
                 ], '/'))
                 break;
-            case "m":
             case "mute":
                 interaction.editReply(createHelpEmbed('#e73c3b', 'Mute command', [
-                    { name: '__Aliases', value: `\`/mute\`, \`/m\``},
                     { name: '__Usage__', value: `**/mute**: Used to mute the bot in the channel the message was sent. When muted, the bot will not respond to any commands.` }
                 ], '/'))
                 break;
-            case "um":
             case "unmute":
                 interaction.editReply(createHelpEmbed('#e73c3b', 'Unmute command', [
-                    { name: '__Aliases', value: `\`/unmute\`, \`/um\``},
                     { name: '__Usage__', value: `**/unmute \n Used to unmute the bot in the channel the message was sent. When muted, the bot will not respond to any commands.` }
                 ], '/'))
                 break;
-            case "sp":
-            case "toggleparanoia":
             case "showparanoia":
                 interaction.editReply(createHelpEmbed('#e73c3b', "Show Paranoia Command", [
-                    { name: '__Aliases', value: `\`/showparanoia\`, \`/toggleparanoia\`, \`/sp\``},
                     { name: '__Usage__', value: `**/showparanoia**: Toggles between only 50% of paranoia questions being shown (intended use) and all of them.` }
                 ], '/'))
                 break;
-            case "cp":
-            case "clearparanoia":
+            case "clear":
                 interaction.editReply(createHelpEmbed('#e73c3b', "Clear Paranoia Command", [
-                    { name: '__Aliases', value: `\`/clearparanoia\`, \`/cp\``},
                     { name: '__Usage__', value: `**/clearparanoia**: Deletes the unanswered paranoia questions, can only be used in DMs.` }
                 ], '/'))
                 break;
-            case "tf":
             case "truthful":
                 interaction.editReply(createHelpEmbed("#e67e21", "Truthful Command", [
-                    { name: '__Aliases', value: `\`/truthful\`, \`/tf\``},
                     { name: '__Usage__', value: `**/truthful [target]**: Uses semi-quasi-pseudo-random procedures to tell you how truthful a user is while answering questions.` }
                 ], '/'))
                 break;
             case "ping":
                 interaction.editReply(createHelpEmbed("#e73c3", "Ping Command", [
-                    { name: '__Aliases', value: `\`/ping\``},
                     { name: '__Usage__', value: `**/ping**: Displays the average ping between the bot and Discord's webservers.` }
                 ], '/'))
                 break;

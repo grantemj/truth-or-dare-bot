@@ -103,6 +103,9 @@ fs.readdirSync('./Commands/').forEach(async file => {
     const cmd = (await import(`./Commands/${file}`));
     if (file.includes("Command")) {
         if (cmd.Command) client.commands.set(file.split('Command')[0].toLowerCase(), cmd.Command);
+        if (cmd.Aliases) cmd.Aliases.forEach(a => {
+            client.commands.set(a, cmd.Command)
+        })
         if (cmd.SlashCommand) client.slashCommands.set(file.split('Command')[0], cmd.SlashCommand);
     }
 });
@@ -227,7 +230,7 @@ client.on('message', async (message) => {
 
 async function processCommand(message, channelSettings, prefix, dm) {
     var fullCommand = dm ? message.content.substr(1) : message.content.substr(prefix.length)
-    let splitCommand = fullCommand.toLowerCase().trim().split(" ");
+    let splitCommand = fullCommand.toLowerCase().trim().split(/ +|\n/gm);
     let primaryCommand = splitCommand[0];
     let args = splitCommand.slice(1);
     if (args.some(item => { return /\[.+\]/.test(item); }) && primaryCommand !== "ans") {
@@ -289,11 +292,11 @@ function sendMessage(channel, messageContent) {
     channel.send(messageContent).catch(() => { console.log("Missing permissions"); });
 }
 
-var dumps = 0
-setInterval(() => {
-    dumps++
-    console.log(client.shard.ids[0] + " " + process.memoryUsage().heapUsed)
-    heapdump.writeSnapshot("/root/dumps/" + client.shard.ids[0] + "_dump_" + dumps + ".heapsnapshot", () => {
-        console.log("Heap written")
-    })
-}, 200000)
+// var dumps = 0
+// setInterval(() => {
+//     dumps++
+//     console.log(client.shard.ids[0] + " " + process.memoryUsage().heapUsed)
+//     heapdump.writeSnapshot("/root/dumps/" + client.shard.ids[0] + "_dump_" + dumps + ".heapsnapshot", () => {
+//         console.log("Heap written")
+//     })
+// }, 200000)

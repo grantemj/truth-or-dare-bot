@@ -1,6 +1,9 @@
-export { Command, SlashCommand, Meta };
+export { Command, SlashCommand, Meta, Aliases };
 import { client, sendMessage, handler } from '../bot.js';
 import { checkUserAns, removeUser } from './paranoiaData.js';
+
+const Aliases = ["a"]
+
 async function Command(args, message) {
     let checkUser = await checkUserAns(message.author.id);
     if (checkUser) {

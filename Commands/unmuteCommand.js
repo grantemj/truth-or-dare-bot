@@ -1,5 +1,8 @@
-export { Command, SlashCommand, Meta };
+export { Command, SlashCommand, Meta, Aliases };
 import { sendMessage, handler } from '../bot.js';
+
+const Aliases = ["um"]
+
 async function Command(args, message, channelSettings, prefix) {
     let { guild } = message
     let member = await guild.members.fetch(message.author.id, false)

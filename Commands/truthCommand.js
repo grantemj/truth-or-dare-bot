@@ -1,6 +1,10 @@
-export { Command, SlashCommand, Meta };
+export { Command, SlashCommand, Meta, Aliases };
 import { TRUTHQUESTIONS, sendMessage } from '../bot.js';
+
+const Aliases = ["t"]
+
 var questionLog = {};
+
 function Command(args, message, channelSettings, prefix) {
     var index;
     var { guild } = message;
@@ -37,9 +41,9 @@ function Command(args, message, channelSettings, prefix) {
         else {
             if (channelSettings[("truth " + args[0])]) {
                 do {
-                    index = Math.floor(Math.random() * truthQUESTIONS[args[0]].length);
+                    index = Math.floor(Math.random() * TRUTHQUESTIONS[args[0]].length);
                 } while (questionLog[guild.id]?.includes(index));
-                sendMessage(message.channel, truthQUESTIONS[args[0]][index]);
+                sendMessage(message.channel, TRUTHQUESTIONS[args[0]][index]);
             }
             else {
                 sendMessage(message.channel, `That rating is disabled here. To enable it, use \`+enable truth ${args[0]}\``);

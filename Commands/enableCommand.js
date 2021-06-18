@@ -1,6 +1,8 @@
-export { Command, SlashCommand, Meta };
+export { Command, SlashCommand, Meta, Aliases };
 import { sendMessage, handler } from '../bot.js';
 import { settingsChange } from './settingsChange.js';
+
+const Aliases = ["en"]
 
 async function Command(args, message, guildSettings, serverPrefix) {
     let guild = message.guild

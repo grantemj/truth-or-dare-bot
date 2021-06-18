@@ -1,5 +1,8 @@
-export { Command, SlashCommand, Meta };
+export { Command, SlashCommand, Meta, Aliases };
 import { Discord, sendMessage } from '../bot.js';
+
+const Aliases = ["links", "vote", "invite"]
+
 function Command(message) {
     let linkEmbed = new Discord.MessageEmbed()
         .setColor('#e91e62')

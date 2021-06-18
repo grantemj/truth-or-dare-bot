@@ -1,5 +1,8 @@
-export { Command, SlashCommand, Meta };
+export { Command, SlashCommand, Meta, Aliases };
 import { Discord, sendMessage, handler } from '../bot.js';
+
+const Aliases = ["config"]
+
 function Command(args, message, channelSettings) {
     if (args.length == 0) {
         let settingsEmbed = new Discord.MessageEmbed()

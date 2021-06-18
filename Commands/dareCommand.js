@@ -1,6 +1,10 @@
-export { Command, SlashCommand, Meta };
+export { Command, SlashCommand, Meta, Aliases };
 import { DAREQUESTIONS, sendMessage } from '../bot.js';
+
+const Aliases = ["d"]
+
 var questionLog = {};
+
 function Command(args, message, channelSettings, prefix) {
     var index;
     var guild = message.guild;

@@ -1,5 +1,8 @@
-export { Command, SlashCommand, Meta };
+export { Command, SlashCommand, Meta, Aliases };
 import { sendMessage } from '../bot.js';
+
+const Aliases = ["tf"]
+
 function Command(message, args) {
     if (message.mentions.users.size === 0) {
         sendMessage(message.channel, "You have to mention a user to gauge their truthfulness.");
