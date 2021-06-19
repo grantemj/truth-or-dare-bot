@@ -28,7 +28,7 @@ const {MongoClient} = require('mongodb')
 async function initiateMongo() {
     let mongoClient = new MongoClient(process.env.MONGOIP, { "useUnifiedTopology": true, "poolSize": 45, "maxPoolSize": 70 });
     try {
-        mongoClient.connect();
+        await mongoClient.connect();
         db = mongoClient.db("tod");
         return true;
     }

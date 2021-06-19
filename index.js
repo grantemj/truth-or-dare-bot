@@ -12,9 +12,10 @@ const { ShardingManager } = require('discord.js-light');
 const manager = new ShardingManager('./bot.js', {
     token: process.env.TOKEN,
     respawn: true,
-    execArgv: ["--trace-warnings"],
-    totalShards: parseInt(process.env.TOTALSHARDS),
-    shardList: process.env.SHARDLIST.split(",").map(x => parseInt(x))
+    execArgv: ["--trace-warnings"]
+    // ,
+    // totalShards: parseInt(process.env.TOTALSHARDS),
+    // shardList: process.env.SHARDLIST.split(",").map(x => parseInt(x))
 });
 manager.on('shardCreate', (shard) => {
     console.log(`Launched shard ${shard.id}`);

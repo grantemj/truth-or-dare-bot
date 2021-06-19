@@ -14,6 +14,9 @@ const client = new Discord.Client({
     allowedMentions: { parse:['users'], repliedUser: true },
     intents: [FLAGS.GUILDS, FLAGS.GUILD_MESSAGES, FLAGS.DIRECT_MESSAGES]
 });
+// setTimeout(() => {
+//     client.ws.connection.triggerReady()
+// },30000)
 /* const topgg = require('@top-gg/sdk');
 const topggAPI = new topgg.Api(process.env.TOPGG); */
 const fs = require('fs');
@@ -95,7 +98,7 @@ export {
     handler
 };
 
-fs.readdirSync('./Commands/').forEach(file => {
+fs.readdirSync('./Commands/').forEach(async file => {
     const cmd = (await import(`./Commands/${file}`));
     client.commands.set(file.split('Command')[0].toLowerCase(), cmd.Command);
     if (cmd.SlashCommand) client.slashCommands.set(file.split('Command')[0], cmd.SlashCommand);
@@ -168,7 +171,7 @@ client.on('channelDelete', async (channel) => {
 
 client.on('interaction', interaction => {
     if (!interaction.isCommand()) return;
-    if (client.slashCommands.has(interaction.commandName) {
+    if (client.slashCommands.has(interaction.commandName)) {
         interaction.defer();
         client.slashCommands.get(interaction.commandName)(args, interaction, guildSettings);
     }
@@ -182,7 +185,11 @@ client.on('message', async (message) => {
     const { guild, channel } = message;
     if (guild) {
         let prefix = await handler.query("getPrefix", guild.id);
-        if (message.content.startsWith(prefix || '+')) {
+        if (prefix === undefined || typeof prefix != 'string') {
+            prefix = "+";
+            handler.query("setPrefix", message.guild.id, prefix);
+        }
+        if (message.content.startsWith(prefix)) {
             let guildSettings = await handler.query("getServerSettings", guild.id);
             if (guildSettings === undefined || guildSettings === null) {
                 console.log("Unindexed guild");
@@ -192,16 +199,15 @@ client.on('message', async (message) => {
                     .forEach(c => {
                         newGuildSettings[c.id] = defaultSettings;
                 });
-                handler.query("setServerSettings", guild.id, newGuildSettings);
                 guildSettings = newGuildSettings
             }
             if (!guildSettings.hasOwnProperty(channel.id)) {
                 console.log("Unindexed channel");
 
                 guildSettings[message.channel.id] = defaultSettings;
-                handler.query("setServerSettings", guild.id, guildSettings);
             }
-            processCommand(message, guildSettings, false);
+            handler.query("setServerSettings", guild.id, guildSettings);
+            processCommand(message, guildSettings, false,prefix);
             if (Math.random() < 0.007) {
                 let linkEmbed = new Discord.MessageEmbed()
                     .setColor('#e91e62')
@@ -214,18 +220,13 @@ client.on('message', async (message) => {
     }
     else {
         if (message.content.startsWith('+')) {
-            processCommand(message, null, true);
+            processCommand(message, null, true,'+');
         }
     }
 });
 
-async function processCommand(message, guildSettings, dm) {
+async function processCommand(message, guildSettings, dm, guildPrefix) {
     if (!dm) {
-        var guildPrefix = await handler.query("getPrefix", message.guild.id);
-        if (guildPrefix === undefined) {
-            guildPrefix = "+";
-            handler.query("setPrefix", message.guild.id, guildPrefix);
-        }
         var fullCommand = message.content.substr(guildPrefix.length);
     }
     else {
@@ -240,8 +241,7 @@ async function processCommand(message, guildSettings, dm) {
     }
     else {
         if (!dm) {
-            guildSettings = guildSettings;
-            if (Date.now() - channelTime[message.channel.id] < 3000) {
+            if (Date.now() - channelTime[message.channel.id] < 3000) {  // Cooldown
                 sendMessage(message.channel, "You're sending commands too fast, wait a few seconds before trying another");
             }
             else if (!guildSettings[message.channel.id]["muted?"]) {
