@@ -1,6 +1,9 @@
 
-export { Command, SlashCommand, Meta };
+export { Command, SlashCommand, Meta, Aliases };
 import { client, Discord, sendMessage, handler } from '../bot.js';
+
+const Aliases = ["s"]
+
 async function Command(message) {
     let serverCount = await handler.query("getServerCount");
     // let upvoteCount = (await topggAPI.getBot("692045914436796436")).monthlyPoints;

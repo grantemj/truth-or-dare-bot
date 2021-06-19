@@ -6,7 +6,7 @@ async function checkUserParanoia(user, guild) {
     }
     let userData = await handler.query("getParanoiaData", user);
     if (userData) {
-        return userData.some((a) => { a.guild === guild; });
+        return userData.some((a) => a.guild === guild);
     }
     else {
         return false;
@@ -38,7 +38,7 @@ async function checkUserAns(user) {
                 return userData[0];
             }
             else {
-                handler.query("removeUser", user);
+                removeUser(user)
                 return undefined;
             }
         }
