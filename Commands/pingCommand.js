@@ -8,5 +8,5 @@ function SlashCommand(interaction) {
 }
 const Meta = {
     name: 'ping',
-    description: "ping Displays the average ping between the bot and Discord's webservers"
+    description: "Displays the average ping between the bot and Discord's webservers"
 }
