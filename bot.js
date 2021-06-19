@@ -241,7 +241,7 @@ async function processCommand(message, guildSettings, dm) {
     else {
         if (!dm) {
             guildSettings = guildSettings;
-            if (Date.now() - channelTime[message.channel.id] < 3000) {
+            if (Date.now() - channelTime[message.channel.id] < guildCooldown) {
                 sendMessage(message.channel, "You're sending commands too fast, wait a few seconds before trying another");
             }
             else if (!guildSettings[message.channel.id]["muted?"]) {

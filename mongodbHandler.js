@@ -74,6 +74,15 @@ const functions = {
         let collection = db.collection('prefixes');
         return collection.deleteOne({ "serverID": id });
     },
+    getCooldown: async (id) => {
+        let collection = db.collection('cooldowns');
+        let result = await collection.findOne({ "serverID": id });
+        return result?.data
+    },
+    setCooldown: async (id, value) => {
+        let collection = db.collection('cooldowns');
+        return collection.findOneAndReplace({ "serverID": id }, { "serverID": id, "data": value }, { "upsert": true });
+    },
     getParanoiaData: async (id) => {
         let collection = db.collection('paranoiaData');
         let result = await collection.findOne({ "userID": id });
