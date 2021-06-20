@@ -99,6 +99,7 @@ export {
     commandIDs
 };
 
+//  TODO: Update to use template
 fs.readdirSync('./Commands/').forEach(async file => {
     const cmd = (await import(`./Commands/${file}`));
     if (file.includes("Command")) {
@@ -228,6 +229,7 @@ client.on('message', async (message) => {
     }
 });
 
+// TODO: Update to use template
 async function processCommand(message, channelSettings, prefix, dm) {
     var fullCommand = dm ? message.content.substr(1) : message.content.substr(prefix.length)
     let splitCommand = fullCommand.toLowerCase().trim().split(/ +|\n/gm);
