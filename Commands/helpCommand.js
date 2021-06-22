@@ -20,7 +20,7 @@ function Command(args, message, channelSettings, prefix) {
     }
     else if (args.length > 1) {
         for (let argument of args) {
-            helpCommand([argument], message, prefix);
+            Command([argument], message, prefix);
         }
     }
     else if (args.length == 1) {

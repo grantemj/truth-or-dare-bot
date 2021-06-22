@@ -1,6 +1,6 @@
 export { Command, SlashCommand, Meta };
 import { client } from '../bot.js';
-function Command(message) {
+function Command(args, message) {
     message.channel.send("Ping: " + client.ws.ping + "ms");
 }
 function SlashCommand(interaction) {
