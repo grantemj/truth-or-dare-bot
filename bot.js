@@ -234,7 +234,7 @@ async function processCommand(message, channelSettings, prefix, dm) {
     let primaryCommand = splitCommand[0];
     let args = splitCommand.slice(1);
     if (args.some(item => { return /\[.+\]/.test(item); }) && primaryCommand !== "ans") {
-        sendMessage(message.channel, `You don't need to enclose your arguments in brackets, the help command uses them as placeholders. Example: Use ${guildPrefix}truth pg, not ${guildPrefix}truth [pg]`);
+        sendMessage(message.channel, `You don't need to enclose your arguments in brackets, the help command uses them as placeholders. Example: Use ${prefix}truth pg, not ${prefix}truth [pg]`);
     }
     else {
         if (!dm) {

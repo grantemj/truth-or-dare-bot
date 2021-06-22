@@ -29,10 +29,10 @@ const defaultSettings = { "muted?": false, "truth pg": true, "truth pg13": true,
 
 var collections = {}
 async function initiateMongo() {
-    let mongoClient = new MongoClient(process.env.MONGOIP, { "useUnifiedTopology": true, "poolSize": 45, "maxPoolSize": 70 });
+    let mongoClient = new MongoClient(process.env.MONGOIP, { "useUnifiedTopology": true, "poolSize": 45, "maxPoolSize": 120 });
     try {
         mongoClient.connect();
-        db = mongoClient.db("tod");
+        db = mongoClient.db("todBeta");
         ["prefixes", "channelSettings", "serverChannels", "paranoiaData", "statistics", "serverCounts"].forEach(coll => {
             collections[coll] = db.collection(coll)
         })
@@ -70,7 +70,7 @@ const functions = {
     getServerChannels: async (id) => {
         let collection = collections.serverChannels
         let result = await collection.findOne({ "serverID": id })
-        let returnData = result?.channels
+        let returnData = result?.channels || []
         return returnData
     },
     setServerChannels: async (id, value) => {
