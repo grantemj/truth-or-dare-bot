@@ -46,7 +46,7 @@ function Command(args, message, channelSettings, prefix) {
                 sendMessage(message.channel, TRUTHQUESTIONS[args[0]][index]);
             }
             else {
-                sendMessage(message.channel, `That rating is disabled here. To enable it, use \`+enable truth ${args[0]}\``);
+                sendMessage(message.channel, `That rating is disabled here. To enable it, use \`${prefix}enable truth ${args[0]}\``);
             }
         }
     }
