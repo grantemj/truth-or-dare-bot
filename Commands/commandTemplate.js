@@ -9,21 +9,23 @@ class Command {
         this.descript   = args.desc;            // Short description to be displayed when help is called on
         this.reArgs     = args.requiredArgs;    // Any arguments that are required for the cmd
         this.opArgs     = args.optionalArgs;    // Any arguments that are optional for the cmd
-        this.runCmd     = args.run;             // The function that actually runs the cmd
+        this.runCmd     = args.cmd;             // The function that actually runs the cmd
+        this.slashCmd   = args.slash;           // The function that actually runs the cmd (via slash)
         this.color      = args.color;           // The color to used any embeds for this cmd
         this.perms      = args.perms;           // The permissions required to run this command
     }
-
-    // TODO: Slash commands where?
-
-    // TODO: Make 'META' from constructor stuff probs
 
     async run(args) {
         // TODO: Check perms
         await this.runCmd(args);
     }
 
-    help(prefix) {
+    async runSlash(args) {
+        // TODO: Check perms
+        await this.slashCmd(args);
+    }
+
+    help(prefix) {      // TODO: Update this
         var allAliases      = ``;
         var allRequired     = ``;
         var allOptionals    = ``;
